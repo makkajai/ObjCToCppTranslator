@@ -82,6 +82,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return super.visitArray_expression(ctx);
     }
 
+
+
     @Override
     public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
         String text = tokens.getText(ctx.getSourceInterval());
@@ -157,7 +159,20 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     @Override
     public Void visitClass_implementation(ObjCParser.Class_implementationContext ctx) {
+
+        String classImplementationText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classImplementationText);
+
+        if(startIndex < 0)
+            return super.visitClass_implementation(ctx);
+
         className = ctx.class_name().getText();
+        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
+
+        int endClassNameIndex = startClassNameIndex + className.length();
+
+        outputBuffer.replace(startIndex, endClassNameIndex, "");
+
         return super.visitClass_implementation(ctx);
     }
 
@@ -264,7 +279,11 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return source.replaceAll("#import", "#include")
                 .replaceAll("super", "base")
                 .replaceAll("self", "this")
-                .replaceAll("nil", "NULL");
+                .replaceAll("nil", "NULL")
+                .replaceAll("@public", "public:")
+                .replaceAll("@private", "private:")
+                .replaceAll("@protected", "protected:")
+                ;
     }
 
     private static String getFileHeader() {
