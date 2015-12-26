@@ -24,6 +24,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
+    private String className;
 
     /**
      * Main Method
@@ -127,7 +128,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitClass_method_definition(ctx);
         }
 
-        translateMethodDefination(ctx.method_definition(), startMethodBody, "static ");
+        translateMethodDefination(ctx.method_definition(), startMethodBody, "");
 
         return super.visitClass_method_definition(ctx);
     }
@@ -152,6 +153,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public Void visitInstance_method_declaration(ObjCParser.Instance_method_declarationContext ctx) {
         System.out.println("Method name:" + ctx.getText());
         return super.visitInstance_method_declaration(ctx);
+    }
+
+    @Override
+    public Void visitClass_implementation(ObjCParser.Class_implementationContext ctx) {
+        className = ctx.class_name().getText();
+        return super.visitClass_implementation(ctx);
     }
 
     @Override
@@ -217,10 +224,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         methodTypeString = methodPrefix + methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " ");
         outputBuffer.replace(startMethodBody, endMethodType, methodTypeString);
 
-        String finalMethodNameParameterTypeAndNames = translateMethodNameParameterTypeAndNames(method_selectorContext);
+        String finalMethodNameParameterTypeAndNames = className + "::" + translateMethodNameParameterTypeAndNames(method_selectorContext);
 
         String methodSelectorString = tokens.getText(method_selectorContext.getSourceInterval());
-        int startMethodSelector = outputBuffer.indexOf(methodSelectorString);
+        int startMethodSelector = outputBuffer.indexOf(methodSelectorString, startMethodBody);
         int endMethodSelector = startMethodSelector + methodSelectorString.length();
         outputBuffer.replace(startMethodSelector, endMethodSelector, finalMethodNameParameterTypeAndNames);
     }
