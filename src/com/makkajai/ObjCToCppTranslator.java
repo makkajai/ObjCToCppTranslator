@@ -72,7 +72,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     @Override
     public Void visitDictionary_pair(ObjCParser.Dictionary_pairContext ctx) {
-        System.out.println("Dictionary Pair:" + ctx.getText());
         return super.visitDictionary_pair(ctx);
     }
 
@@ -93,27 +92,65 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String receiver = translateReceiver(tokens.getText(ctx.receiver().getSourceInterval()));
         String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
-        finalMethod += translateMethodNameAndParameters(ctx, finalMethod);
+        finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
 
         outputBuffer.replace(start, end, finalMethod);
         return super.visitMessage_expression(ctx);
     }
 
     @Override
+    public Void visitInstance_method_definition(ObjCParser.Instance_method_definitionContext ctx) {
+        String methodBody = tokens.getText(ctx.getSourceInterval());
+
+        int startMethodBody = outputBuffer.indexOf(methodBody);
+
+        startMethodBody = outputBuffer.lastIndexOf("-", startMethodBody);
+
+        if(startMethodBody < 0) {
+            return super.visitInstance_method_definition(ctx);
+        }
+
+        translateMethodDefination(ctx.method_definition(), startMethodBody, "");
+
+        return super.visitInstance_method_definition(ctx);
+    }
+
+    @Override
+    public Void visitClass_method_definition(ObjCParser.Class_method_definitionContext ctx) {
+        String methodBody = tokens.getText(ctx.getSourceInterval());
+
+        int startMethodBody = outputBuffer.indexOf(methodBody);
+
+        startMethodBody = outputBuffer.lastIndexOf("+", startMethodBody);
+
+        if(startMethodBody < 0) {
+            return super.visitClass_method_definition(ctx);
+        }
+
+        translateMethodDefination(ctx.method_definition(), startMethodBody, "static ");
+
+        return super.visitClass_method_definition(ctx);
+    }
+
+    @Override
     public Void visitMethod_definition(ObjCParser.Method_definitionContext ctx) {
-//        System.out.println("Method name:" + ctx.getText());
         return super.visitMethod_definition(ctx);
     }
 
     @Override
+    public Void visitMethod_selector(ObjCParser.Method_selectorContext ctx) {
+        return super.visitMethod_selector(ctx);
+    }
+
+    @Override
     public Void visitMethod_declaration(ObjCParser.Method_declarationContext ctx) {
-//        System.out.println("Method name:" + ctx.getText());
+        System.out.println("Method name:" + ctx.getText());
         return super.visitMethod_declaration(ctx);
     }
 
     @Override
     public Void visitInstance_method_declaration(ObjCParser.Instance_method_declarationContext ctx) {
-//        System.out.println("Method name:" + ctx.getText());
+        System.out.println("Method name:" + ctx.getText());
         return super.visitInstance_method_declaration(ctx);
     }
 
@@ -142,19 +179,19 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return "->";
     }
 
-    private String translateMethodNameAndParameters(ObjCParser.Message_expressionContext ctx, String finalMethod) {
+    private String translateMethodNameAndParameters(ObjCParser.Message_selectorContext messageSelectorContext) {
         String finalMethodName = "";
         String finalParameters = "";
 
         //If this is just a method with no keyword argument we need to get just the selector and use it as the method name.
-        if(ctx.message_selector().keyword_argument().size() == 0) {
-            finalMethodName = tokens.getText(ctx.message_selector().selector().getSourceInterval());
+        if(messageSelectorContext.keyword_argument().size() == 0) {
+            finalMethodName = tokens.getText(messageSelectorContext.selector().getSourceInterval());
         }
 
         //Well this method is made up of multiple parts we will need to upper case the subsequent parts to follow Camel case convention
         //and then pass the parameters as method call.
-        for (int i=0; i<ctx.message_selector().keyword_argument().size(); i++) {
-            ObjCParser.Keyword_argumentContext keyword_argumentContext = ctx.message_selector().keyword_argument().get(i);
+        for (int i = 0; i< messageSelectorContext.keyword_argument().size(); i++) {
+            ObjCParser.Keyword_argumentContext keyword_argumentContext = messageSelectorContext.keyword_argument().get(i);
             String sourceMethod = tokens.getText(keyword_argumentContext.selector().getSourceInterval());
             String sourceParameter = tokens.getText(keyword_argumentContext.expression().getSourceInterval());
             if(i > 0) {
@@ -165,7 +202,54 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             finalParameters += sourceParameter;
         }
 
-        return finalMethodName + "(" + finalParameters + "))";
+        return finalMethodName + "(" + finalParameters + ")";
+    }
+
+    private void translateMethodDefination(ObjCParser.Method_definitionContext methodDefinitionContext, int startMethodBody, String methodPrefix) {
+
+        ObjCParser.Method_typeContext method_typeContext = methodDefinitionContext.method_type();
+        ObjCParser.Method_selectorContext method_selectorContext = methodDefinitionContext.method_selector();
+
+        String methodTypeString = tokens.getText(method_typeContext.getSourceInterval());
+        int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
+        int endMethodType = startMethodType + methodTypeString.length();
+
+        methodTypeString = methodPrefix + methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " ");
+        outputBuffer.replace(startMethodBody, endMethodType, methodTypeString);
+
+        String finalMethodNameParameterTypeAndNames = translateMethodNameParameterTypeAndNames(method_selectorContext);
+
+        String methodSelectorString = tokens.getText(method_selectorContext.getSourceInterval());
+        int startMethodSelector = outputBuffer.indexOf(methodSelectorString);
+        int endMethodSelector = startMethodSelector + methodSelectorString.length();
+        outputBuffer.replace(startMethodSelector, endMethodSelector, finalMethodNameParameterTypeAndNames);
+    }
+
+    private String translateMethodNameParameterTypeAndNames(ObjCParser.Method_selectorContext methodSelectorContext) {
+        String finalMethodName = "";
+        String finalParameters = "";
+
+        //If this is just a method with no keyword argument we need to get just the selector and use it as the method name.
+        if(methodSelectorContext.keyword_declarator().size() == 0) {
+            finalMethodName = tokens.getText(methodSelectorContext.selector().getSourceInterval());
+        }
+
+        //Well this method is made up of multiple parts we will need to upper case the subsequent parts to follow Camel case convention
+        //and then pass the parameters as method call.
+        for (int i = 0; i< methodSelectorContext.keyword_declarator().size(); i++) {
+            ObjCParser.Keyword_declaratorContext keyword_declaratorContext = methodSelectorContext.keyword_declarator().get(i);
+            String sourceMethod = tokens.getText(keyword_declaratorContext.selector().getSourceInterval());
+            String sourceType = tokens.getText(keyword_declaratorContext.method_type(0).getSourceInterval());
+            String sourceParameter = tokens.getText(keyword_declaratorContext.IDENTIFIER().getSourceInterval());
+            if(i > 0) {
+                sourceMethod = sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1);
+                finalParameters += ", ";
+            }
+            finalMethodName += sourceMethod;
+            finalParameters += sourceType.replaceAll("\\(", "").replaceAll("\\)", "") + " " + sourceParameter;
+        }
+
+        return finalMethodName + "(" + finalParameters + ")";
     }
 
     private String translateLiterals(String source) {
