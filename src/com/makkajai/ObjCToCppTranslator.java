@@ -21,10 +21,16 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
     public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "([A-Z]{1})(.*)";
+    public static final String END = "@end";
+    public static final String COCOS2D = "cocos2d::";
+    public static final String REF = "Ref";
+    public static final String NS_OBJECT = "NSObject";
+    public static final String CC = "CC";
 
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
     private String className;
+    private String superClassName;
 
     /**
      * Main Method
@@ -35,7 +41,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public static void main(String[] args) throws IOException {
         //The input file to parse!
         ANTLRInputStream input = new ANTLRInputStream(
-                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m")); // we'll
+//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"));
+//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"));
+                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/CCSnowFall.m"));
 
 
         //The instance of the translator.
@@ -52,7 +60,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         ParseTree tree = parser.translation_unit();
 
         //Output file.
-        FileWriter outputFile = new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp");
+        FileWriter outputFile =
+//                new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1");
+                new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp");
         visitor.outputBuffer = new StringBuilder(getFileHeader())
                 .append(visitor.tokens.getText());
 
@@ -66,39 +76,90 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitMethod_type(ObjCParser.Method_typeContext ctx) {
-//        System.out.println("Method type:" + ctx.getText());
-        return super.visitMethod_type(ctx);
+    public Void visitClass_interface(ObjCParser.Class_interfaceContext ctx) {
+        String classImplementationText = tokens.getText(ctx.getSourceInterval());
+        System.out.println(classImplementationText);
+        int startIndex = outputBuffer.indexOf(classImplementationText);
+        int startEndIndexIndex = outputBuffer.lastIndexOf(END);
+
+        if(startIndex < 0)
+            return super.visitClass_interface(ctx);
+
+        className = ctx.class_name().getText();
+        superClassName = ctx.superclass_name().getText();
+        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
+        int startSuperClassNameIndex = outputBuffer.indexOf(superClassName, startClassNameIndex);
+
+        int endClassNameIndex = startClassNameIndex + className.length();
+        int endSuperClassNameIndex = (startSuperClassNameIndex > 0)? startSuperClassNameIndex + superClassName.length() : endClassNameIndex;
+
+        outputBuffer
+                .replace(startEndIndexIndex, startEndIndexIndex + END.length(), "\n};")
+                .replace(startIndex, endSuperClassNameIndex, translateClassDecleration());
+
+        return super.visitClass_interface(ctx);
     }
 
     @Override
-    public Void visitDictionary_pair(ObjCParser.Dictionary_pairContext ctx) {
-        return super.visitDictionary_pair(ctx);
+    public Void visitClass_implementation(ObjCParser.Class_implementationContext ctx) {
+
+        String classImplementationText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classImplementationText);
+        int startEndIndexIndex = outputBuffer.lastIndexOf(END);
+
+        if(startIndex < 0)
+            return super.visitClass_implementation(ctx);
+
+        className = ctx.class_name().getText();
+        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
+
+        int endClassNameIndex = startClassNameIndex + className.length();
+
+        outputBuffer
+                .replace(startEndIndexIndex, startEndIndexIndex + END.length(), "")
+                .replace(startIndex, endClassNameIndex, "");
+
+        return super.visitClass_implementation(ctx);
     }
 
     @Override
-    public Void visitArray_expression(ObjCParser.Array_expressionContext ctx) {
-        System.out.println("Array expression:" + ctx.getText());
-        return super.visitArray_expression(ctx);
-    }
+    public Void visitClass_method_declaration(ObjCParser.Class_method_declarationContext ctx) {
+        String methodBody = tokens.getText(ctx.getSourceInterval());
 
+        int startMethodBody = outputBuffer.indexOf(methodBody);
 
+        startMethodBody = outputBuffer.lastIndexOf("+", startMethodBody);
 
-    @Override
-    public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
-        String text = tokens.getText(ctx.getSourceInterval());
-        int start = outputBuffer.indexOf(text);
-        if(start < 0) {
-            return super.visitMessage_expression(ctx);
+        if(startMethodBody < 0) {
+            return super.visitClass_method_declaration(ctx);
         }
-        int end = start + text.length();
 
-        String receiver = translateReceiver(tokens.getText(ctx.receiver().getSourceInterval()));
-        String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
-        finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
+        ObjCParser.Method_declarationContext method_declarationContext = ctx.method_declaration();
 
-        outputBuffer.replace(start, end, finalMethod);
-        return super.visitMessage_expression(ctx);
+        translateMethodDefination(method_declarationContext.method_type(),
+                method_declarationContext.method_selector(), startMethodBody, "static ", false);
+
+        return super.visitClass_method_declaration(ctx);
+    }
+
+    @Override
+    public Void visitInstance_method_declaration(ObjCParser.Instance_method_declarationContext ctx) {
+        String methodBody = tokens.getText(ctx.getSourceInterval());
+
+        int startMethodBody = outputBuffer.indexOf(methodBody);
+
+        startMethodBody = outputBuffer.lastIndexOf("-", startMethodBody);
+
+        if(startMethodBody < 0) {
+            return super.visitInstance_method_declaration(ctx);
+        }
+
+        ObjCParser.Method_declarationContext method_declarationContext = ctx.method_declaration();
+
+        translateMethodDefination(method_declarationContext.method_type(),
+                method_declarationContext.method_selector(), startMethodBody, "", false);
+
+        return super.visitInstance_method_declaration(ctx);
     }
 
     @Override
@@ -113,7 +174,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitInstance_method_definition(ctx);
         }
 
-        translateMethodDefination(ctx.method_definition(), startMethodBody, "");
+        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
+                "", true);
 
         return super.visitInstance_method_definition(ctx);
     }
@@ -130,62 +192,39 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitClass_method_definition(ctx);
         }
 
-        translateMethodDefination(ctx.method_definition(), startMethodBody, "");
+        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
+                "", true);
 
         return super.visitClass_method_definition(ctx);
     }
 
     @Override
-    public Void visitMethod_definition(ObjCParser.Method_definitionContext ctx) {
-        return super.visitMethod_definition(ctx);
+    public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
+        String text = tokens.getText(ctx.getSourceInterval());
+        int start = outputBuffer.indexOf(text);
+        if(start < 0) {
+            return super.visitMessage_expression(ctx);
+        }
+        int end = start + text.length();
+
+        String receiver = translateIdentifier(tokens.getText(ctx.receiver().getSourceInterval()));
+        String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
+        finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
+
+        outputBuffer.replace(start, end, finalMethod);
+        return super.visitMessage_expression(ctx);
     }
 
-    @Override
-    public Void visitMethod_selector(ObjCParser.Method_selectorContext ctx) {
-        return super.visitMethod_selector(ctx);
-    }
-
-    @Override
-    public Void visitMethod_declaration(ObjCParser.Method_declarationContext ctx) {
-        System.out.println("Method name:" + ctx.getText());
-        return super.visitMethod_declaration(ctx);
-    }
-
-    @Override
-    public Void visitInstance_method_declaration(ObjCParser.Instance_method_declarationContext ctx) {
-        System.out.println("Method name:" + ctx.getText());
-        return super.visitInstance_method_declaration(ctx);
-    }
-
-    @Override
-    public Void visitClass_implementation(ObjCParser.Class_implementationContext ctx) {
-
-        String classImplementationText = tokens.getText(ctx.getSourceInterval());
-        int startIndex = outputBuffer.indexOf(classImplementationText);
-
-        if(startIndex < 0)
-            return super.visitClass_implementation(ctx);
-
-        className = ctx.class_name().getText();
-        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
-
-        int endClassNameIndex = startClassNameIndex + className.length();
-
-        outputBuffer.replace(startIndex, endClassNameIndex, "");
-
-        return super.visitClass_implementation(ctx);
-    }
-
-    @Override
-    public Void visitClass_method_declaration(ObjCParser.Class_method_declarationContext ctx) {
-//        System.out.println("Method name:" + ctx.getText());
-        return super.visitClass_method_declaration(ctx);
-    }
-
-    private String translateReceiver(String receiver) {
+    private String translateIdentifier(String receiver) {
         Pattern pattern = Pattern.compile(BEGINS_WITH_2_UPPER_CASE_LETTERS);
         Matcher matcher = pattern.matcher(receiver);
-        if(matcher.matches()) {
+        boolean matches = matcher.matches();
+        if(receiver.equals(NS_OBJECT)) {
+            return REF;
+        } else if(receiver.startsWith(CC)) {
+            return COCOS2D + matcher.group(2);
+        }
+        if(matches) {
             return matcher.group(2);
         }
         return receiver;
@@ -227,10 +266,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return finalMethodName + "(" + finalParameters + ")";
     }
 
-    private void translateMethodDefination(ObjCParser.Method_definitionContext methodDefinitionContext, int startMethodBody, String methodPrefix) {
-
-        ObjCParser.Method_typeContext method_typeContext = methodDefinitionContext.method_type();
-        ObjCParser.Method_selectorContext method_selectorContext = methodDefinitionContext.method_selector();
+    private void translateMethodDefination(ObjCParser.Method_typeContext method_typeContext, ObjCParser.Method_selectorContext method_selectorContext, int startMethodBody, String methodPrefix, boolean shouldAddClassname) {
 
         String methodTypeString = tokens.getText(method_typeContext.getSourceInterval());
         int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
@@ -239,7 +275,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         methodTypeString = methodPrefix + methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " ");
         outputBuffer.replace(startMethodBody, endMethodType, methodTypeString);
 
-        String finalMethodNameParameterTypeAndNames = className + "::" + translateMethodNameParameterTypeAndNames(method_selectorContext);
+        String classNamePrefix = shouldAddClassname? className + "::" : "";
+        String finalMethodNameParameterTypeAndNames = classNamePrefix + translateMethodNameParameterTypeAndNames(method_selectorContext);
 
         String methodSelectorString = tokens.getText(method_selectorContext.getSourceInterval());
         int startMethodSelector = outputBuffer.indexOf(methodSelectorString, startMethodBody);
@@ -268,7 +305,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 finalParameters += ", ";
             }
             finalMethodName += sourceMethod;
-            finalParameters += sourceType.replaceAll("\\(", "").replaceAll("\\)", "") + " " + sourceParameter;
+            finalParameters += translateIdentifier(sourceType.replaceAll("\\(", "").replaceAll("\\)", "")) + " " + sourceParameter;
         }
 
         return finalMethodName + "(" + finalParameters + ")";
@@ -296,5 +333,17 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 + " * (c) 2015 Makkajai\n"
                 + " * This code is licensed under MIT license (see LICENSE.txt for details)\n"
                 + " */\n\n";
+    }
+
+    private String translateClassDecleration() {
+        return "class " + translateIdentifier(className) + translateSuperClassDecleration();
+    }
+
+    private String translateSuperClassDecleration() {
+        if (superClassName == null) {
+            return "";
+        }
+
+        return " : " + translateIdentifier(superClassName);
     }
 }
