@@ -8,8 +8,6 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by administrator on 25/12/15.
@@ -33,9 +31,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m")); // we'll
 
 
-        // parse
-        // this
-        // file
         ObjCToCppTranslator visitor = new ObjCToCppTranslator(); // extends JavaBaseVisitor<Void>
         visitor.lexer = new ObjCLexer(input);
         visitor.tokens = new CommonTokenStream(visitor.lexer);
@@ -51,7 +46,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         // you're interested
         visitor.visit(tree);
         visitor.fileWriter.write(visitor.sourceFile.toString()
-                .replaceAll("import", "include")
+                .replaceAll("#import", "#include")
                 .replaceAll("super", "base")
                 .replaceAll("self", "this"));
         visitor.fileWriter.flush();
@@ -90,15 +85,40 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     @Override
     public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
-        System.out.println("Message expression:" + ctx.getText());
+        String text = tokens.getText(ctx.getSourceInterval());
+        int start = sourceFile.indexOf(text);
+        if(start < 0) {
+            return super.visitMessage_expression(ctx);
+        }
+        int end = start + text.length();
+
         System.out.println("Receiver expression:" + ctx.receiver().getText());
-        System.out.println("MessageSelector expression:" + ctx.message_selector().getText());
-        for (int i=0; i<ctx.message_selector().keyword_argument().size(); i++) {
-            ObjCParser.Keyword_argumentContext keyword_argumentContext = ctx.message_selector().keyword_argument().get(i);
-            System.out.println("KeywoardContext expression:" + keyword_argumentContext.selector().getText());
-            System.out.println("KeywoardContext expression:" + keyword_argumentContext.expression().getText());
+
+        String finalMethod = "(" + tokens.getText(ctx.receiver().getSourceInterval()) + "->";
+
+        String finalMethodName = "";
+        String finalParameters = "";
+
+        if(ctx.message_selector().keyword_argument().size() == 0) {
+            finalMethodName = tokens.getText(ctx.message_selector().selector().getSourceInterval());
         }
 
+        for (int i=0; i<ctx.message_selector().keyword_argument().size(); i++) {
+            ObjCParser.Keyword_argumentContext keyword_argumentContext = ctx.message_selector().keyword_argument().get(i);
+            String sourceMethodName = tokens.getText(keyword_argumentContext.selector().getSourceInterval());
+            String sourceParameter = tokens.getText(keyword_argumentContext.expression().getSourceInterval());
+            if(i > 0) {
+                sourceMethodName = sourceMethodName.substring(0, 1).toUpperCase() + sourceMethodName.substring(1);
+                finalParameters += ", ";
+            }
+            finalMethodName += sourceMethodName;
+            finalParameters += sourceParameter;
+            System.out.println("KeyValue expression:" + sourceMethodName + " Parameter: " + sourceParameter);
+        }
+
+        finalMethod += finalMethodName + "(" + finalParameters + "))";
+
+        sourceFile.replace(start, end, finalMethod);
         return super.visitMessage_expression(ctx);
     }
 
@@ -106,33 +126,33 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public Void visitPrimary_expression(ObjCParser.Primary_expressionContext ctx) {
 //        System.out.println("Primary expression:" + ctx.getText());
 
-        String text = tokens.getText(ctx.getSourceInterval());
-        int start = sourceFile.indexOf(text);
-        if(start < 0) {
-            return super.visitPrimary_expression(ctx);
-        }
-
-        int end = start + text.length();
-
-        Pattern compile = Pattern.compile("(\\[(?s:.+)\\])((?s:.+)\\])");
-        if(text.indexOf("]") == text.lastIndexOf("]")) {
-            compile = Pattern.compile("(\\[(?s:.+))\\W+((?s:.+)\\])");
-        }
-        Matcher matcher = compile.matcher(text);
-
-        boolean matches = matcher.matches();
-        if(!matches) {
-            return super.visitPrimary_expression(ctx);
-        }
-
-//        System.out.println("Text: " + text);
-        String modifiedText = text;
-        modifiedText = "(" + matcher.group(1).replaceFirst("\\[", "") + "->" + matcher.group(2).replace("]", "()") + ")";
-        for (int i =1; i<=matcher.groupCount(); i++) {
-//            System.out.println("Matcher: " + matcher.group(i));
-        }
-
-        sourceFile.replace(start, end, modifiedText);
+//        String text = tokens.getText(ctx.getSourceInterval());
+//        int start = sourceFile.indexOf(text);
+//        if(start < 0) {
+//            return super.visitPrimary_expression(ctx);
+//        }
+//
+//        int end = start + text.length();
+//
+//        Pattern compile = Pattern.compile("(\\[(?s:.+)\\])((?s:.+)\\])");
+//        if(text.indexOf("]") == text.lastIndexOf("]")) {
+//            compile = Pattern.compile("(\\[(?s:.+))\\W+((?s:.+)\\])");
+//        }
+//        Matcher matcher = compile.matcher(text);
+//
+//        boolean matches = matcher.matches();
+//        if(!matches) {
+//            return super.visitPrimary_expression(ctx);
+//        }
+//
+////        System.out.println("Text: " + text);
+//        String modifiedText = text;
+//        modifiedText = "(" + matcher.group(1).replaceFirst("\\[", "") + "->" + matcher.group(2).replace("]", "()") + ")";
+//        for (int i =1; i<=matcher.groupCount(); i++) {
+////            System.out.println("Matcher: " + matcher.group(i));
+//        }
+//
+//        sourceFile.replace(start, end, modifiedText);
 
         return super.visitPrimary_expression(ctx);
     }
