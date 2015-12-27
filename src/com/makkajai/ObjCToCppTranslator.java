@@ -27,6 +27,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public static final String REF = COCOS2D + "Ref";
     public static final String NS_OBJECT = "NSObject";
     public static final String CC = "CC";
+    public static final String CCNodeColor = "CCNodeColor";
+    public static final String NODE = "Node";
 
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
@@ -44,8 +46,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         ANTLRInputStream input = new ANTLRInputStream(
 //                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"));
 //                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"));
-                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai//Home.m"));
-//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"));
+//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"));
+                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"));
 
 
         //The instance of the translator.
@@ -133,7 +135,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         outputBuffer
                 .replace(startEndIndexIndex, startEndIndexIndex + END.length(), "\n};")
-                .replace(startIndex, endSuperClassNameIndex, translateClassDecleration());
+                .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
 
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
@@ -242,6 +244,23 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         return super.visitClass_method_definition(ctx);
     }
+    
+    @Override
+    public Void visitDeclaration(ObjCParser.DeclarationContext ctx) {
+        String sourceDeclaration = tokens.getText(ctx.getSourceInterval());
+
+        int start = outputBuffer.indexOf(sourceDeclaration);
+        if(start < 0) {
+            return super.visitDeclaration(ctx);
+        }
+
+        String declarationSpecifierSourceText = tokens.getText(ctx.declaration_specifiers().getSourceInterval());
+        int startDeclarationSpecifier = outputBuffer.indexOf(sourceDeclaration, start);
+
+        outputBuffer.replace(startDeclarationSpecifier, startDeclarationSpecifier + declarationSpecifierSourceText.length(),
+                translateIdentifier(declarationSpecifierSourceText));
+        return super.visitDeclaration(ctx);
+    }
 
     @Override
     public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
@@ -260,22 +279,24 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return super.visitMessage_expression(ctx);
     }
 
-    private String translateIdentifier(String receiver) {
-        if(receiver == null) return null;
+    private String translateIdentifier(String identifier) {
+        if(identifier == null) return null;
         Pattern pattern = Pattern.compile(BEGINS_WITH_2_UPPER_CASE_LETTERS);
-        Matcher matcher = pattern.matcher(receiver);
+        Matcher matcher = pattern.matcher(identifier);
         boolean matches = matcher.matches();
-        if(receiver.equals(NS_OBJECT)) {
+        if(identifier.equals(NS_OBJECT)) {
             return REF;
-        } else if(receiver.startsWith(BOOL)) {
-            return receiver.toLowerCase();
-        } else if(receiver.startsWith(CC)) {
+        } else if(identifier.startsWith(BOOL)) {
+            return identifier.toLowerCase();
+        } else if(identifier.startsWith(CCNodeColor)) {
+            return COCOS2D + identifier.replace(CCNodeColor, NODE);
+        } else if(identifier.startsWith(CC)) {
             return COCOS2D + matcher.group(2);
         }
         if(matches) {
             return matcher.group(2);
         }
-        return receiver;
+        return identifier;
     }
 
     private String translateInvocationOperator(String receiver) {
@@ -383,11 +404,11 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 + " */\n\n";
     }
 
-    private String translateClassDecleration() {
-        return "class " + translateIdentifier(className) + translateSuperClassDecleration();
+    private String translateClassDeclaration() {
+        return "class " + translateIdentifier(className) + translateSuperClassDeclaration();
     }
 
-    private String translateSuperClassDecleration() {
+    private String translateSuperClassDeclaration() {
         if (superClassName == null) {
             return "";
         }
