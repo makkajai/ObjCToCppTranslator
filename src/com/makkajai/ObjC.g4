@@ -699,7 +699,7 @@ UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
-IMPORT : '#import' [ \t]* (STRING|ANGLE_STRING) WS -> channel(HIDDEN) ;
+IMPORT : '#import' [ \t]* (STRING|ANGLE_STRING) WS ;
 INCLUDE: '#include'[ \t]* (STRING|ANGLE_STRING) WS -> channel(HIDDEN) ;
 PRAGMA : '#pragma' ~[\r\n]* -> channel(HIDDEN) ;
 
