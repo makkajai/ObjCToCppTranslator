@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,6 +30,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public static final String CC = "CC";
     public static final String CCNodeColor = "CCNodeColor";
     public static final String NODE = "Node";
+    public static final String H = ".h";
+    private static String fileName;
 
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
@@ -43,12 +46,18 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
      */
     public static void main(String[] args) throws IOException {
         //The input file to parse!
-        ANTLRInputStream input = new ANTLRInputStream(
-//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"));
-//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"));
-//                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"));
-                new FileInputStream("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"));
 
+        File file =
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m");
+                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h");
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+        ANTLRInputStream input = new ANTLRInputStream(fileInputStream);
+
+        fileName = file.getName();
 
         //The instance of the translator.
         ObjCToCppTranslator visitor = new ObjCToCppTranslator();
@@ -67,19 +76,17 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         FileWriter outputFile =
 //                new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1");
                 new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp");
-        visitor.outputBuffer = new StringBuilder(getFileHeader())
+        visitor.outputBuffer = new StringBuilder()
                 .append(visitor.tokens.getText());
 
         //This is where the entire file is parsed and appropreat callbacks are made to parse the input file.
         visitor.visit(tree);
 
         //All done, lets write the output buffer to the output file and get done with it!
-        outputFile.write(visitor.translateLiterals(visitor.outputBuffer.toString()));
+        outputFile.write(visitor.translateLiterals(visitor.getFileHeader() + visitor.outputBuffer.toString()));
         outputFile.flush();
         outputFile.close();
     }
-
-
 
     @Override
     public Void visitPreprocessor_declaration(ObjCParser.Preprocessor_declarationContext ctx) {
@@ -133,12 +140,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int endClassNameIndex = startClassNameIndex + className.length();
         int endSuperClassNameIndex = (startSuperClassNameIndex > 0)? startSuperClassNameIndex + superClassName.length() : endClassNameIndex;
 
-        outputBuffer
-                .replace(startEndIndexIndex, startEndIndexIndex + END.length(), "\n};")
-                .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
-
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
+
+        outputBuffer
+                .replace(startEndIndexIndex, startEndIndexIndex + END.length(),
+                        String.format("\nCREATE_FUNC(%s);\n\n};\n\n#endif // __%s_H__", className, className.toUpperCase())
+                )
+                .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
 
         return super.visitClass_interface(ctx);
     }
@@ -392,7 +401,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 ;
     }
 
-    private static String getFileHeader() {
+    private String getFileHeader() {
+
         return
                   "/**\n"
                 + " * Autogenerated by ObjCToCppTranslator on "
@@ -401,7 +411,13 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 + " * @author Deep Shah\n"
                 + " * (c) 2015 Makkajai\n"
                 + " * This code is licensed under MIT license (see LICENSE.txt for details)\n"
-                + " */\n\n";
+                + " */\n\n"
+                + getIfnDefForHeaderFiles();
+    }
+
+    private String getIfnDefForHeaderFiles() {
+        if(!fileName.endsWith(H)) return "";
+        return String.format("#ifndef __%s_H__\n#define __%s_H__\n\n", className.toUpperCase(), className.toUpperCase());
     }
 
     private String translateClassDeclaration() {
