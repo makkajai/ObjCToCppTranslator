@@ -26,6 +26,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private static final Dictionary<String, String> TYPES_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final Dictionary<String, String> METHODS_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final List<String> instanceVariables;
+    private static final List<String> methodSignatures;
     private static String className;
     private static String superClassName;
 
@@ -65,6 +66,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
 
         instanceVariables = new ArrayList<String>();
+        methodSignatures = new ArrayList<String>();
     }
 
     /**
@@ -143,6 +145,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(!visitor.isHeaderFile()) {
             instanceVariables.clear();
         }
+        if(visitor.isHeaderFile() && !shouldCreateOutput) {
+            methodSignatures.clear();
+        }
 
         //This is where the entire file is parsed and appropreat callbacks are made to parse the input file.
         visitor.visit(tree);
@@ -217,7 +222,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         outputBuffer
                 .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(),
-                        String.format("\nCREATE_FUNC(%s);\n\n};\n\n#endif // __%s_H__", className, className.toUpperCase())
+                        String.format("\nCREATE_FUNC(%s);\n\n%s\n\n};\n\n#endif // __%s_H__", className, translatePrivateMethodsDeclaration(), className.toUpperCase())
                 )
                 .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
 
@@ -303,7 +308,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
-                "", true);
+                "virtual ", true);
 
         isProcessingInstanceMethod = true;
 
@@ -394,8 +399,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return super.visitInstance_variables(ctx);
     }
 
-
-
     @Override
     public Void visitDeclaration(ObjCParser.DeclarationContext ctx) {
         String sourceDeclaration = tokens.getText(ctx.getSourceInterval());
@@ -412,6 +415,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 translateIdentifier(declarationSpecifierSourceText));
         return super.visitDeclaration(ctx);
     }
+
+
 
     @Override
     public Void visitPostfix_expression(ObjCParser.Postfix_expressionContext ctx) {
@@ -551,7 +556,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return finalMethodName + "(" + finalParameters + ")";
     }
 
-    private void translateMethodDefination(ObjCParser.Method_typeContext method_typeContext, ObjCParser.Method_selectorContext method_selectorContext, int startMethodBody, String methodPrefix, boolean shouldAddClassname) {
+    private void translateMethodDefination(ObjCParser.Method_typeContext method_typeContext, ObjCParser.Method_selectorContext method_selectorContext,
+                                           int startMethodBody, String methodPrefix, boolean shouldAddClassname) {
 
         String methodTypeString = tokens.getText(method_typeContext.getSourceInterval());
         int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
@@ -561,11 +567,18 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         outputBuffer.replace(startMethodBody, endMethodType, methodTypeString);
 
         String classNamePrefix = shouldAddClassname? className + "::" : "";
-        String finalMethodNameParameterTypeAndNames = classNamePrefix + translateMethodNameParameterTypeAndNames(method_selectorContext);
+        String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
+        String finalMethodNameParameterTypeAndNames = classNamePrefix + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
+        String finalMethodTypeNameParameterTypeAndNames = methodTypeString + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
 
         String methodSelectorString = tokens.getText(method_selectorContext.getSourceInterval());
         int startMethodSelector = outputBuffer.indexOf(methodSelectorString, startMethodBody);
         int endMethodSelector = startMethodSelector + methodSelectorString.length();
+        if(methodSignatures.contains(finalMethodTypeNameParameterTypeAndNames)) {
+            methodSignatures.remove(finalMethodTypeNameParameterTypeAndNames);
+        } else {
+            methodSignatures.add(finalMethodTypeNameParameterTypeAndNames);
+        }
         outputBuffer.replace(startMethodSelector, endMethodSelector, finalMethodNameParameterTypeAndNames);
     }
 
@@ -645,5 +658,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private boolean isHeaderFile() {
         return fileName.endsWith(H);
+    }
+
+    private String translatePrivateMethodsDeclaration() {
+        String finalPrivateMethodsDeclaration = "private: \n";
+        for (final String methodDeclaration : methodSignatures) {
+            finalPrivateMethodsDeclaration += "\n" + methodDeclaration;
+        }
+        finalPrivateMethodsDeclaration += "\n";
+        return finalPrivateMethodsDeclaration;
     }
 }
