@@ -423,6 +423,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String sourceText = tokens.getText(ctx);
 
         int start = outputBuffer.indexOf(sourceText);
+
+        if(start < 0) {
+            System.out.println("Stop now");
+        }
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
 
         String finalExpression = "";
@@ -575,6 +579,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             methodSignatures.remove(finalMethodTypeNameParameterTypeAndNames);
         } else {
             methodSignatures.add(finalMethodTypeNameParameterTypeAndNames);
+        }
+        if(finalMethodTypeNameParameterTypeAndNames.contains("getAllCharacters")) {
+            System.out.println("Break");
         }
         outputBuffer.replace(startMethodSelector, endMethodSelector, finalMethodNameParameterTypeAndNames);
     }
