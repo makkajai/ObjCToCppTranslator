@@ -9,10 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,16 +22,17 @@ import static com.makkajai.Constants.*;
  */
 public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
-    private static String fileName;
-
     private static final Dictionary<String, String> KEYWORDS_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final Dictionary<String, String> TYPES_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final Dictionary<String, String> METHODS_VS_TRANSLATIONS = new Hashtable<String, String>();
+    private static final List<String> instanceVariables;
 
+    private String fileName;
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
     private String className;
     private String superClassName;
+    private boolean isProcessingInstanceMethod;
 
     static {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, Keywords.BASE);
@@ -65,6 +63,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         METHODS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         METHODS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
+
+        instanceVariables = new ArrayList<String>();
     }
 
     /**
@@ -81,18 +81,18 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m");
-                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h");
+                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h");
 
         FileInputStream fileInputStream = new FileInputStream(file);
         ANTLRInputStream input = new ANTLRInputStream(fileInputStream);
 
-        fileName = file.getName();
-
         //The instance of the translator.
         ObjCToCppTranslator visitor = new ObjCToCppTranslator();
+
+        visitor.fileName = file.getName();
 
         //Getting the lexer.
         ObjCLexer lexer = new ObjCLexer(input);
@@ -110,6 +110,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp");
         visitor.outputBuffer = new StringBuilder()
                 .append(visitor.tokens.getText());
+
+        if(!visitor.isHeaderFile()) {
+            instanceVariables.clear();
+        }
 
         //This is where the entire file is parsed and appropreat callbacks are made to parse the input file.
         visitor.visit(tree);
@@ -265,6 +269,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
                 "", true);
 
+        isProcessingInstanceMethod = true;
+
         return super.visitInstance_method_definition(ctx);
     }
 
@@ -283,6 +289,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
                 "", true);
 
+        isProcessingInstanceMethod = false;
+
         return super.visitClass_method_definition(ctx);
     }
 
@@ -297,10 +305,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String type = tokens.getText(ctx.struct_declaration().specifier_qualifier_list());
         String variable = tokens.getText(ctx.struct_declaration().struct_declarator_list());
-        String finalPropertyText = "CC_SYNTHESIZE(" + translateIdentifier(type);
+        String finalPropertyText = CC_SYNTHESIZE + translateIdentifier(type);
 
-        if(variable.contains("*")) {
-            finalPropertyText += "*";
+        if(variable.contains(ASTERISK)) {
+            finalPropertyText += ASTERISK;
         }
 
         String transformedVariable = variable.replace('*', ' ').trim();
@@ -310,6 +318,49 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         return super.visitProperty_declaration(ctx);
     }
+
+    @Override
+    public Void visitInstance_variables(ObjCParser.Instance_variablesContext ctx) {
+
+        String sourceInstanceVariables = tokens.getText(ctx);
+
+        System.out.println(sourceInstanceVariables);
+
+        int start = outputBuffer.indexOf(sourceInstanceVariables);
+        if(start < 0) {
+            return super.visitInstance_variables(ctx);
+        }
+
+        ObjCParser.Visibility_specificationContext visibilitySpecificationContext = ctx.visibility_specification();
+        if(visibilitySpecificationContext != null)
+            instanceVariables.add(tokens.getText(visibilitySpecificationContext));
+
+        for (ObjCParser.Struct_declarationContext structDeclarationContext : ctx.struct_declaration()) {
+            String type = tokens.getText(structDeclarationContext.specifier_qualifier_list());
+            String variable = tokens.getText(structDeclarationContext.struct_declarator_list());
+
+            instanceVariables.add(translateIdentifier(type) + " " + variable + ";");
+        }
+
+        if(!isHeaderFile()) {
+            outputBuffer.replace(start, start+sourceInstanceVariables.length(), "");
+            return super.visitInstance_variables(ctx);
+        }
+
+        String finalInstanceVariables = "{\n\n";
+        for (final String variable : instanceVariables) {
+            finalInstanceVariables += variable + "\n";
+        }
+
+        finalInstanceVariables += "\npublic:";
+
+        outputBuffer.replace(start, start+sourceInstanceVariables.length(), finalInstanceVariables);
+
+
+        return super.visitInstance_variables(ctx);
+    }
+
+
 
     @Override
     public Void visitDeclaration(ObjCParser.DeclarationContext ctx) {
@@ -363,6 +414,11 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(matches) {
             return matcher.group(2);
         }
+
+        if(identifier.startsWith(Keywords.SELF) && !isProcessingInstanceMethod) {
+            return className;
+        }
+
         return identifier;
     }
 
@@ -380,12 +436,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateInvocationOperator(String receiver) {
         Pattern pattern = Pattern.compile(BEGINS_WITH_UPPER_CASE_LETTERS);
-        Matcher matcher = pattern.matcher(receiver);
+        Matcher matcher = pattern.matcher(receiver.replaceAll(COCOS2D, ""));
         if(matcher.matches()) {
             //Looks like we are making a static call.
-            return "::";
+            return STATIC_INVOCATION_OPERATOR;
         }
-        return "->";
+        return INSTANCE_INVOCATION_OPERATOR;
     }
 
     private String translateMethodNameAndParameters(ObjCParser.Message_selectorContext messageSelectorContext) {
@@ -486,7 +542,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private String getIfnDefForHeaderFiles() {
-        if(!fileName.endsWith(H)) return "";
+        if(!isHeaderFile()) return "";
         return String.format("#ifndef __%s_H__\n#define __%s_H__\n\n", className.toUpperCase(), className.toUpperCase());
     }
 
@@ -504,5 +560,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String toUpperFirstLetter(final String sourceMethod) {
         return sourceMethod != null && sourceMethod.length() > 0? sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1) : "";
+    }
+
+    private boolean isHeaderFile() {
+        return fileName.endsWith(H);
     }
 }

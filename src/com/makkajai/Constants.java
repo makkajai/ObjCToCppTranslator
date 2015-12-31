@@ -5,12 +5,17 @@ package com.makkajai;
  */
 public class Constants {
 
+    public static final String STATIC_INVOCATION_OPERATOR = "::";
+    public static final String INSTANCE_INVOCATION_OPERATOR = "->";
     public static final String H = ".h";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
     public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "([A-Z]{1})(.*)";
     public static final String CC = "CC";
-    public static final String COCOS2D = "cocos2d::";
+
+    public static final String COCOS2D = "cocos2d" + STATIC_INVOCATION_OPERATOR;
+    public static final String CC_SYNTHESIZE = "CC_SYNTHESIZE(";
+    public static final String ASTERISK = "*";
 
 
     public static class Keywords {
@@ -58,13 +63,13 @@ public class Constants {
         public static final String ARRAY = COCOS2D + "__Array";
 
         public static final String CGPOINT = "CGPoint";
-        public static final String VEC2 = "Vec2";
+        public static final String VEC2 = COCOS2D + "Vec2";
 
         public static final String CGSIZE = "CGSize";
-        public static final String SIZE = "Size";
+        public static final String SIZE = COCOS2D + "Size";
 
         public static final String CGRECT = "CGRect";
-        public static final String RECT = "Rect";
+        public static final String RECT = COCOS2D + "Rect";
     }
 
     public static class Methods {
@@ -72,13 +77,13 @@ public class Constants {
         public static final String CREATE_WITH_FORMAT = "createWithFormat";
 
         public static final String CCP = "ccp";
-        public static final String VEC2 = "Vec2";
+        public static final String VEC2 = COCOS2D + "Vec2";
 
         public static final String CG_RECT_MAKE = "CGRectMake";
-        public static final String RECT = "Rect";
+        public static final String RECT = COCOS2D + "Rect";
 
         public static final String CG_SIZE_MAKE = "CGSizeMake";
-        public static final String SIZE = "Size";
+        public static final String SIZE = COCOS2D + "Size";
 
     }
 }
