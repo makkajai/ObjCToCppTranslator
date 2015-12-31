@@ -43,6 +43,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_PUBLIC, Keywords.PUBLIC);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_PROTECTED, Keywords.PROTECTED);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_PRIVATE, Keywords.PRIVATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.YES, Keywords.TRUE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.NO, Keywords.FALSE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_QUOTE, Keywords.QUOTE);
+        KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
+        KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
+        KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
 
         TYPES_VS_TRANSLATIONS.put(Types.NS_OBJECT, Types.REF);
         TYPES_VS_TRANSLATIONS.put(Types.NS_STRING, Types.STRING);
@@ -51,8 +57,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.NS_MUTABLE_ARRAY, Types.ARRAY);
         TYPES_VS_TRANSLATIONS.put(Types.BOOL, Types.BOOL.toLowerCase());
         TYPES_VS_TRANSLATIONS.put(Types.ID, Types.REF_POINTER);
+        TYPES_VS_TRANSLATIONS.put(Types.CGPOINT, Types.VEC2);
+        TYPES_VS_TRANSLATIONS.put(Types.CGSIZE, Types.SIZE);
+        TYPES_VS_TRANSLATIONS.put(Types.CGRECT, Types.RECT);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
+        METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
+        METHODS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
+        METHODS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
     }
 
     /**
@@ -67,8 +79,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         File file =
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m");
-                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m");
+//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m");
+                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m");
 //                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h");
 
@@ -135,7 +149,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             }
             headerFileName += translateIdentifier(parts[i]);
         }
-        headerFileName += isWithAngleBrackets? ">" : "\"" + "\n";
+        headerFileName += (isWithAngleBrackets? ">" : "\"") + "\n";
         outputBuffer.replace(startIndex, endIndex, Keywords.INCLUDE + headerFileName);
 
         return super.visitPreprocessor_declaration(ctx);
@@ -274,7 +288,26 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     @Override
     public Void visitProperty_declaration(ObjCParser.Property_declarationContext ctx) {
-        System.out.println(tokens.getText(ctx.getSourceInterval()));
+        String sourceText = tokens.getText(ctx);
+
+        int start = outputBuffer.indexOf(sourceText);
+        if(start < 0) {
+            super.visitProperty_declaration(ctx);
+        }
+
+        String type = tokens.getText(ctx.struct_declaration().specifier_qualifier_list());
+        String variable = tokens.getText(ctx.struct_declaration().struct_declarator_list());
+        String finalPropertyText = "CC_SYNTHESIZE(" + translateIdentifier(type);
+
+        if(variable.contains("*")) {
+            finalPropertyText += "*";
+        }
+
+        String transformedVariable = variable.replace('*', ' ').trim();
+        finalPropertyText += ", " + transformedVariable + ", " + toUpperFirstLetter(transformedVariable) + ");";
+
+        outputBuffer.replace(start, start + sourceText.length(), finalPropertyText);
+
         return super.visitProperty_declaration(ctx);
     }
 
@@ -368,10 +401,11 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         //and then pass the parameters as method call.
         for (int i = 0; i< messageSelectorContext.keyword_argument().size(); i++) {
             ObjCParser.Keyword_argumentContext keyword_argumentContext = messageSelectorContext.keyword_argument().get(i);
-            String sourceMethod = tokens.getText(keyword_argumentContext.selector().getSourceInterval());
+            ObjCParser.SelectorContext selector = keyword_argumentContext.selector();
+            String sourceMethod = selector == null? "" : tokens.getText(selector.getSourceInterval());
             String sourceParameter = tokens.getText(keyword_argumentContext.expression().getSourceInterval());
             if(i > 0) {
-                sourceMethod = sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1);
+                sourceMethod = toUpperFirstLetter(sourceMethod);
                 finalParameters += ", ";
             }
             finalMethodName += translateMethodName(sourceMethod);
@@ -417,7 +451,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             String sourceType = tokens.getText(keyword_declaratorContext.method_type(0).getSourceInterval());
             String sourceParameter = tokens.getText(keyword_declaratorContext.IDENTIFIER().getSourceInterval());
             if(i > 0) {
-                sourceMethod = sourceMethod.length() > 0? sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1) : "";
+                sourceMethod = toUpperFirstLetter(sourceMethod);
                 finalParameters += ", ";
             }
             finalMethodName += sourceMethod;
@@ -466,5 +500,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         return " : public " + translateIdentifier(superClassName);
+    }
+
+    private String toUpperFirstLetter(final String sourceMethod) {
+        return sourceMethod != null && sourceMethod.length() > 0? sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1) : "";
     }
 }

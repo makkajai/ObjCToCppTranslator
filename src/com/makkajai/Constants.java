@@ -29,6 +29,12 @@ public class Constants {
         public static final String IMPORT = "#import ";
         public static final String INCLUDE = "#include ";
         public static final String END = "@end";
+        public static final String YES = "YES";
+        public static final String TRUE = "true";
+        public static final String NO = "NO";
+        public static final String FALSE = "false";
+        public static final String AT_QUOTE = "@\"";
+        public static final String QUOTE = "\"";
     }
 
     public static class Types {
@@ -51,11 +57,28 @@ public class Constants {
         public static final String NS_ARRAY = "NSArray";
         public static final String ARRAY = COCOS2D + "__Array";
 
+        public static final String CGPOINT = "CGPoint";
+        public static final String VEC2 = "Vec2";
+
+        public static final String CGSIZE = "CGSize";
+        public static final String SIZE = "Size";
+
+        public static final String CGRECT = "CGRect";
+        public static final String RECT = "Rect";
     }
 
     public static class Methods {
         public static final String STRING_WITH_FORMAT = "stringWithFormat";
         public static final String CREATE_WITH_FORMAT = "createWithFormat";
+
+        public static final String CCP = "ccp";
+        public static final String VEC2 = "Vec2";
+
+        public static final String CG_RECT_MAKE = "CGRectMake";
+        public static final String RECT = "Rect";
+
+        public static final String CG_SIZE_MAKE = "CGSizeMake";
+        public static final String SIZE = "Size";
 
     }
 }
