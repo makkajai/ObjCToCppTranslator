@@ -426,21 +426,18 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
 
         String finalExpression = "";
-        int lastIndexOfBracket = sourceText.lastIndexOf("]");
-        int lastIndexOfDot = sourceText.lastIndexOf(".");
-        if (lastIndexOfDot >= 0 && lastIndexOfDot > lastIndexOfBracket) {
-            finalExpression = tokens.getText(ctx.primary_expression());
-
-            for (int i=0; i<ctx.identifier().size(); i++) {
-                finalExpression = "("
-                                + finalExpression
-                                + INSTANCE_INVOCATION_OPERATOR
-                                + "get"
-                                + toUpperFirstLetter(tokens.getText(ctx.identifier(i)))
-                                + "())";
+        for (int i=0; i<ctx.children.size(); i++) {
+            String nodeText = tokens.getText(ctx.children.get(i).getSourceInterval());
+            if(ctx.children.get(i) instanceof ObjCParser.IdentifierContext) {
+                finalExpression += "get" + toUpperFirstLetter(nodeText) + "()";
+                finalExpression = "(" + finalExpression + ")";
+            } else {
+                if(nodeText.equals(".")) {
+                    nodeText = INSTANCE_INVOCATION_OPERATOR;
+                }
+                finalExpression += nodeText;
             }
         }
-        System.out.println(finalExpression);
         outputBuffer.replace(start, start + sourceText.length(), finalExpression);
         return super.visitPostfix_expression(ctx);
     }
