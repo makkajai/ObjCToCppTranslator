@@ -26,12 +26,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private static final Dictionary<String, String> TYPES_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final Dictionary<String, String> METHODS_VS_TRANSLATIONS = new Hashtable<String, String>();
     private static final List<String> instanceVariables;
+    private static String className;
+    private static String superClassName;
 
     private String fileName;
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
-    private String className;
-    private String superClassName;
     private boolean isProcessingInstanceMethod;
 
     static {
@@ -74,17 +74,51 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        //The input file to parse!
+        translateFile(
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
+        , false);
+        translateFile(
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
+        , true);
+        translateFile(
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
+        , true);
+//        translateFile(
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
+////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
+//        );
+    }
 
-        File file =
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m");
-                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m");
-//                new File("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h");
+    private static void translateFile(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
+        //The input file to parse!
+        File file = new File(fileNameWithPath);
 
         FileInputStream fileInputStream = new FileInputStream(file);
         ANTLRInputStream input = new ANTLRInputStream(fileInputStream);
@@ -103,11 +137,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         //Parser obviously.
         ObjCParser parser = new ObjCParser(visitor.tokens);
         ParseTree tree = parser.translation_unit();
-
-        //Output file.
-        FileWriter outputFile =
-//                new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1");
-                new FileWriter("/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp");
         visitor.outputBuffer = new StringBuilder()
                 .append(visitor.tokens.getText());
 
@@ -119,9 +148,16 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         visitor.visit(tree);
 
         //All done, lets write the output buffer to the output file and get done with it!
-        outputFile.write(visitor.translateKeywords(visitor.getFileHeader() + visitor.outputBuffer.toString()));
-        outputFile.flush();
-        outputFile.close();
+        if(shouldCreateOutput) {
+            String outputFileName =
+                    visitor.isHeaderFile()?
+                        "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1" :
+                        "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp";
+            FileWriter outputFile = new FileWriter(outputFileName);
+            outputFile.write(visitor.translateKeywords(visitor.getFileHeader() + visitor.outputBuffer.toString()));
+            outputFile.flush();
+            outputFile.close();
+        }
     }
 
     @Override
@@ -199,7 +235,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitClass_implementation(ctx);
 
         className = translateIdentifier(ctx.class_name().getText());
-        superClassName = ctx.superclass_name() != null ? ctx.superclass_name().getText() : null;
+        superClassName = ctx.superclass_name() != null ? ctx.superclass_name().getText() : superClassName;
         int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
 
         int endClassNameIndex = startClassNameIndex + className.length();
@@ -287,7 +323,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
-                "", true);
+                "static ", true);
 
         isProcessingInstanceMethod = false;
 
@@ -323,8 +359,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public Void visitInstance_variables(ObjCParser.Instance_variablesContext ctx) {
 
         String sourceInstanceVariables = tokens.getText(ctx);
-
-        System.out.println(sourceInstanceVariables);
 
         int start = outputBuffer.indexOf(sourceInstanceVariables);
         if(start < 0) {
@@ -380,6 +414,33 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitPostfix_expression(ObjCParser.Postfix_expressionContext ctx) {
+        String sourceText = tokens.getText(ctx);
+
+        int start = outputBuffer.indexOf(sourceText);
+        if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
+
+        String finalExpression = "";
+        int lastIndexOfBracket = sourceText.lastIndexOf("]");
+        int lastIndexOfDot = sourceText.lastIndexOf(".");
+        if (lastIndexOfDot >= 0 && lastIndexOfDot > lastIndexOfBracket) {
+            finalExpression = tokens.getText(ctx.primary_expression());
+
+            for (int i=0; i<ctx.identifier().size(); i++) {
+                finalExpression = "("
+                                + finalExpression
+                                + INSTANCE_INVOCATION_OPERATOR
+                                + "get"
+                                + toUpperFirstLetter(tokens.getText(ctx.identifier(i)))
+                                + "())";
+            }
+        }
+        System.out.println(finalExpression);
+        outputBuffer.replace(start, start + sourceText.length(), finalExpression);
+        return super.visitPostfix_expression(ctx);
+    }
+
+    @Override
     public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
         String text = tokens.getText(ctx.getSourceInterval());
         int start = outputBuffer.indexOf(text);
@@ -394,6 +455,24 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         outputBuffer.replace(start, end, finalMethod);
         return super.visitMessage_expression(ctx);
+    }
+
+    private String translatePropertiesToGetter(String identifier) {
+        int lastIndexOfBracket = identifier.lastIndexOf("]");
+        int lastIndexOfDot = identifier.lastIndexOf("."), previousIndexOfDot = identifier.length() - 1;
+        while (lastIndexOfDot >= 0 && lastIndexOfDot > lastIndexOfBracket) {
+            identifier =
+                    "("
+                    + identifier.subSequence(0, lastIndexOfDot)
+                    + INSTANCE_INVOCATION_OPERATOR
+                    + "get"
+                    + toUpperFirstLetter(identifier.substring(lastIndexOfDot + 1, previousIndexOfDot))
+                    + "())"
+                    + ((previousIndexOfDot >= identifier.length() - 1)? "" : identifier.substring(previousIndexOfDot));
+            previousIndexOfDot = lastIndexOfDot + 1;
+            lastIndexOfDot = identifier.lastIndexOf(".");
+        }
+        return identifier;
     }
 
     private String translateIdentifier(String identifier) {
@@ -437,7 +516,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private String translateInvocationOperator(String receiver) {
         Pattern pattern = Pattern.compile(BEGINS_WITH_UPPER_CASE_LETTERS);
         Matcher matcher = pattern.matcher(receiver.replaceAll(COCOS2D, ""));
-        if(matcher.matches()) {
+        if(receiver.isEmpty()) return "";
+        else if(matcher.matches()) {
             //Looks like we are making a static call.
             return STATIC_INVOCATION_OPERATOR;
         }
@@ -519,7 +599,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateKeywords(String source) {
         //Final set of translations to get rid of the imports and supers and self and nil.
-
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, superClassName + STATIC_INVOCATION_OPERATOR);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
         for (final String key : Collections.list(KEYWORDS_VS_TRANSLATIONS.keys())) {
             source = source.replaceAll(key, KEYWORDS_VS_TRANSLATIONS.get(key));
         }

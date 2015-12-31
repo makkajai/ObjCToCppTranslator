@@ -10,7 +10,7 @@ public class Constants {
     public static final String H = ".h";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
-    public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "([A-Z]{1})(.*)";
+    public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "(\\_\\_)?([A-Z]{1})(.*)";
     public static final String CC = "CC";
 
     public static final String COCOS2D = "cocos2d" + STATIC_INVOCATION_OPERATOR;
