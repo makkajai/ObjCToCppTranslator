@@ -17,7 +17,7 @@ public class Constants {
     public static final String CC_SYNTHESIZE = "CC_SYNTHESIZE(";
     public static final String CC_SYNTHESIZE_PASS_BY_REF = "CC_SYNTHESIZE_PASS_BY_REF(";
     public static final String ASTERISK = "*";
-
+    public static final String CCARRAY_FOREACH = "CCARRAY_FOREACH(";
 
     public static class Keywords {
         public static final String SUPER = "super";
@@ -41,6 +41,8 @@ public class Constants {
         public static final String FALSE = "false";
         public static final String AT_QUOTE = "@\"";
         public static final String QUOTE = "\"";
+        public static final String PERCENTAGE_QUOTE = "%@";
+        public static final String PERCENTAGE_S = "%s";
     }
 
     public static class Types {

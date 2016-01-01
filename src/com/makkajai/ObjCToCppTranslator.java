@@ -46,6 +46,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.YES, Keywords.TRUE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.NO, Keywords.FALSE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_QUOTE, Keywords.QUOTE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.PERCENTAGE_QUOTE, Keywords.PERCENTAGE_S);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
@@ -110,16 +111,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
         , true);
-//        translateFile(
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
-//        );
     }
 
     private static void translateFile(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
@@ -420,8 +411,25 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int startDeclarationSpecifier = outputBuffer.indexOf(sourceDeclaration, start);
 
         writeToOutputBuffer(startDeclarationSpecifier, startDeclarationSpecifier + declarationSpecifierSourceText.length(),
-                sourceDeclaration, translateIdentifier(declarationSpecifierSourceText));
+                declarationSpecifierSourceText, translateIdentifier(declarationSpecifierSourceText));
         return super.visitDeclaration(ctx);
+    }
+
+    @Override
+    public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
+        String sourceText = tokens.getText(ctx.getSourceInterval());
+        int start = outputBuffer.indexOf(sourceText);
+        if(start < 0) {
+            return super.visitMessage_expression(ctx);
+        }
+        int end = start + sourceText.length();
+
+        String receiver = translateIdentifier(tokens.getText(ctx.receiver().getSourceInterval()));
+        String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
+        finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
+
+        writeToOutputBuffer(start, end, sourceText, finalMethod);
+        return super.visitMessage_expression(ctx);
     }
 
     @Override
@@ -449,23 +457,41 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return super.visitPostfix_expression(ctx);
     }
 
-
-
     @Override
-    public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
-        String sourceText = tokens.getText(ctx.getSourceInterval());
-        int start = outputBuffer.indexOf(sourceText);
-        if(start < 0) {
-            return super.visitMessage_expression(ctx);
+    public Void visitFor_in_statement(ObjCParser.For_in_statementContext ctx) {
+        String sourceForLoop = tokens.getText(ctx);
+
+        int startForLoop = outputBuffer.indexOf(sourceForLoop);
+        if(startForLoop < 0) {
+            return super.visitFor_in_statement(ctx);
         }
-        int end = start + sourceText.length();
 
-        String receiver = translateIdentifier(tokens.getText(ctx.receiver().getSourceInterval()));
-        String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
-        finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
+        int indexOfPreviousNewline = outputBuffer.lastIndexOf("\n", startForLoop);
+        int indexOfFirstNewLine = sourceForLoop.indexOf("\n");
 
-        writeToOutputBuffer(start, end, sourceText, finalMethod);
-        return super.visitMessage_expression(ctx);
+        String whitespaceSeparator = outputBuffer.substring(indexOfPreviousNewline, startForLoop);
+        String whitespaceSeparatorInLoop =
+                sourceForLoop.substring(indexOfFirstNewLine + 1,
+                        indexOfFirstNewLine + sourceForLoop.substring(indexOfFirstNewLine).length() - sourceForLoop.substring(indexOfFirstNewLine).trim().length());
+
+        String variableName = tokens.getText(ctx.type_variable_declarator().declarator().direct_declarator());
+        String variableNameWithRef = variableName + "_ref";
+        String finalForLoop =
+                Types.REF_POINTER + " " + variableNameWithRef + ";"
+                        + whitespaceSeparator
+                        + CCARRAY_FOREACH + tokens.getText(ctx.expression()) + ", "
+                        + variableNameWithRef + ") {\n"
+                        + whitespaceSeparatorInLoop
+                        + tokens.getText(ctx.type_variable_declarator()) + " = dynamic_cast<"
+                        + tokens.getText(ctx.type_variable_declarator().declaration_specifiers())
+                        + (ctx.type_variable_declarator().declarator().pointer() != null ?
+                            tokens.getText(ctx.type_variable_declarator().declarator().pointer()) : "")
+                        + ">(" + variableNameWithRef + ");";
+
+
+        writeToOutputBuffer(startForLoop, startForLoop + sourceForLoop.length(), sourceForLoop, finalForLoop + sourceForLoop.substring(indexOfFirstNewLine));
+
+        return super.visitFor_in_statement(ctx);
     }
 
     private String translateIdentifier(String identifier) {
@@ -602,6 +628,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private String translateKeywords(String source) {
         //Final set of translations to get rid of the imports and supers and self and nil.
         for (final String key : Collections.list(sourceVsDestinationText.keys())) {
+            if(sourceVsDestinationText.get(key).contains(key))
+                continue;
             while(source.contains(key)) {
                 source = source.replace(key, sourceVsDestinationText.get(key));
             }
