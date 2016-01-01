@@ -198,20 +198,19 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     @Override
     public Void visitClass_interface(ObjCParser.Class_interfaceContext ctx) {
-        String classImplementationText = tokens.getText(ctx.getSourceInterval());
-        int startIndex = outputBuffer.indexOf(classImplementationText);
+        String classInterfaceText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classInterfaceText);
         int startEndIndexIndex = outputBuffer.lastIndexOf(Keywords.END);
 
         if(startIndex < 0)
             return super.visitClass_interface(ctx);
 
-        className = ctx.class_name().getText();
-        superClassName = ctx.superclass_name().getText();
-        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
-        int startSuperClassNameIndex = outputBuffer.indexOf(superClassName, startClassNameIndex);
-
-        int endClassNameIndex = startClassNameIndex + className.length();
-        int endSuperClassNameIndex = (startSuperClassNameIndex > 0)? startSuperClassNameIndex + superClassName.length() : endClassNameIndex;
+        className = ctx.class_name().IDENTIFIER().getText();
+        superClassName = ctx.superclass_name().IDENTIFIER().getText();
+        int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
+        int indexOfBrace = outputBuffer.indexOf("{", startIndex);
+        int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
+        String suffix = (indexOfBrace >= 0)? "" : "{";
 
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
@@ -221,7 +220,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                         String.format("\nCREATE_FUNC(%s);\n\n%s\n\n};\n\n#endif // __%s_H__", className, translatePrivateMethodsDeclaration(),
                                 className.toUpperCase())
                 )
-                .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
+                .replace(startIndex, finalIndexToConsider, translateClassDeclaration(ctx.protocol_reference_list()) + suffix);
 
         return super.visitClass_interface(ctx);
     }
@@ -664,16 +663,28 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return String.format("#ifndef __%s_H__\n#define __%s_H__\n\n", className.toUpperCase(), className.toUpperCase());
     }
 
-    private String translateClassDeclaration() {
-        return "class " + translateIdentifier(className) + translateSuperClassDeclaration();
+    private String translateClassDeclaration(ObjCParser.Protocol_reference_listContext protocol_reference_listContext) {
+        String classDeclaration = "class " + translateIdentifier(className)
+                + " :" + translateSuperClassDeclaration(superClassName);
+
+        if(protocol_reference_listContext != null) {
+            String separator = superClassName != null? "," : "";
+            List<ObjCParser.Protocol_nameContext> protocol_nameContexts = protocol_reference_listContext.protocol_list().protocol_name();
+            for (ObjCParser.Protocol_nameContext protocol_nameContext : protocol_nameContexts) {
+                classDeclaration += separator + translateSuperClassDeclaration(translateIdentifier(protocol_nameContext.IDENTIFIER().getText()));
+                separator = ",";
+            }
+        }
+
+        return classDeclaration + " ";
     }
 
-    private String translateSuperClassDeclaration() {
-        if (superClassName == null) {
+    private String translateSuperClassDeclaration(String cName) {
+        if (cName == null) {
             return "";
         }
 
-        return " : public " + translateIdentifier(superClassName);
+        return " public " + translateIdentifier(cName);
     }
 
     private String toUpperFirstLetter(final String sourceMethod) {
