@@ -476,6 +476,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String variableName = tokens.getText(ctx.type_variable_declarator().declarator().direct_declarator());
         String variableNameWithRef = variableName + "_ref";
+
+        //Please forgive me for this ugly code to also take care of intend.
         String finalForLoop =
                 Types.REF_POINTER + " " + variableNameWithRef + ";"
                         + whitespaceSeparator
