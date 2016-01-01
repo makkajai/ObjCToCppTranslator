@@ -34,6 +34,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private CommonTokenStream tokens;
     private StringBuilder outputBuffer;
     private boolean isProcessingInstanceMethod;
+    private Dictionary<String, String> sourceVsDestinationText;
 
     static {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, Keywords.BASE);
@@ -142,6 +143,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         visitor.outputBuffer = new StringBuilder()
                 .append(visitor.tokens.getText());
 
+        visitor.sourceVsDestinationText = new Hashtable<String, String>();
         if(!visitor.isHeaderFile()) {
             instanceVariables.clear();
         }
@@ -195,7 +197,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             headerFileName += translateIdentifier(parts[i]);
         }
         headerFileName += (isWithAngleBrackets? ">" : "\"") + "\n";
-        outputBuffer.replace(startIndex, endIndex, Keywords.INCLUDE + headerFileName);
+        writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName);
 
         return super.visitPreprocessor_declaration(ctx);
     }
@@ -222,7 +224,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         outputBuffer
                 .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(),
-                        String.format("\nCREATE_FUNC(%s);\n\n%s\n\n};\n\n#endif // __%s_H__", className, translatePrivateMethodsDeclaration(), className.toUpperCase())
+                        String.format("\nCREATE_FUNC(%s);\n\n%s\n\n};\n\n#endif // __%s_H__", className, translatePrivateMethodsDeclaration(),
+                                className.toUpperCase())
                 )
                 .replace(startIndex, endSuperClassNameIndex, translateClassDeclaration());
 
@@ -270,7 +273,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         ObjCParser.Method_declarationContext method_declarationContext = ctx.method_declaration();
 
         translateMethodDefination(method_declarationContext.method_type(),
-                method_declarationContext.method_selector(), startMethodBody, "static ", false);
+                method_declarationContext.method_selector(), tokens.getText(method_declarationContext), startMethodBody, "static ", false);
 
         return super.visitClass_method_declaration(ctx);
     }
@@ -290,7 +293,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         ObjCParser.Method_declarationContext method_declarationContext = ctx.method_declaration();
 
         translateMethodDefination(method_declarationContext.method_type(),
-                method_declarationContext.method_selector(), startMethodBody, "virtual ", false);
+                method_declarationContext.method_selector(), tokens.getText(method_declarationContext), startMethodBody, "virtual ", false);
 
         return super.visitInstance_method_declaration(ctx);
     }
@@ -307,7 +310,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitInstance_method_definition(ctx);
         }
 
-        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
+        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
                 "virtual ", true);
 
         isProcessingInstanceMethod = true;
@@ -327,7 +330,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitClass_method_definition(ctx);
         }
 
-        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), startMethodBody,
+        translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
                 "static ", true);
 
         isProcessingInstanceMethod = false;
@@ -355,7 +358,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String transformedVariable = variable.replace('*', ' ').trim();
         finalPropertyText += ", " + transformedVariable + ", " + toUpperFirstLetter(transformedVariable) + ");";
 
-        outputBuffer.replace(start, start + sourceText.length(), finalPropertyText);
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalPropertyText);
 
         return super.visitProperty_declaration(ctx);
     }
@@ -382,7 +385,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         if(!isHeaderFile()) {
-            outputBuffer.replace(start, start+sourceInstanceVariables.length(), "");
+            writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, "");
             return super.visitInstance_variables(ctx);
         }
 
@@ -393,7 +396,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         finalInstanceVariables += "\npublic:";
 
-        outputBuffer.replace(start, start+sourceInstanceVariables.length(), finalInstanceVariables);
+        writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, finalInstanceVariables);
 
 
         return super.visitInstance_variables(ctx);
@@ -411,12 +414,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String declarationSpecifierSourceText = tokens.getText(ctx.declaration_specifiers().getSourceInterval());
         int startDeclarationSpecifier = outputBuffer.indexOf(sourceDeclaration, start);
 
-        outputBuffer.replace(startDeclarationSpecifier, startDeclarationSpecifier + declarationSpecifierSourceText.length(),
-                translateIdentifier(declarationSpecifierSourceText));
+        writeToOutputBuffer(startDeclarationSpecifier, startDeclarationSpecifier + declarationSpecifierSourceText.length(),
+                sourceDeclaration, translateIdentifier(declarationSpecifierSourceText));
         return super.visitDeclaration(ctx);
     }
-
-
 
     @Override
     public Void visitPostfix_expression(ObjCParser.Postfix_expressionContext ctx) {
@@ -424,9 +425,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         int start = outputBuffer.indexOf(sourceText);
 
-        if(start < 0) {
-            System.out.println("Stop now");
-        }
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
 
         String finalExpression = "";
@@ -442,43 +440,27 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 finalExpression += nodeText;
             }
         }
-        outputBuffer.replace(start, start + sourceText.length(), finalExpression);
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression);
         return super.visitPostfix_expression(ctx);
     }
 
+
+
     @Override
     public Void visitMessage_expression(ObjCParser.Message_expressionContext ctx) {
-        String text = tokens.getText(ctx.getSourceInterval());
-        int start = outputBuffer.indexOf(text);
+        String sourceText = tokens.getText(ctx.getSourceInterval());
+        int start = outputBuffer.indexOf(sourceText);
         if(start < 0) {
             return super.visitMessage_expression(ctx);
         }
-        int end = start + text.length();
+        int end = start + sourceText.length();
 
         String receiver = translateIdentifier(tokens.getText(ctx.receiver().getSourceInterval()));
         String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
         finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
 
-        outputBuffer.replace(start, end, finalMethod);
+        writeToOutputBuffer(start, end, sourceText, finalMethod);
         return super.visitMessage_expression(ctx);
-    }
-
-    private String translatePropertiesToGetter(String identifier) {
-        int lastIndexOfBracket = identifier.lastIndexOf("]");
-        int lastIndexOfDot = identifier.lastIndexOf("."), previousIndexOfDot = identifier.length() - 1;
-        while (lastIndexOfDot >= 0 && lastIndexOfDot > lastIndexOfBracket) {
-            identifier =
-                    "("
-                    + identifier.subSequence(0, lastIndexOfDot)
-                    + INSTANCE_INVOCATION_OPERATOR
-                    + "get"
-                    + toUpperFirstLetter(identifier.substring(lastIndexOfDot + 1, previousIndexOfDot))
-                    + "())"
-                    + ((previousIndexOfDot >= identifier.length() - 1)? "" : identifier.substring(previousIndexOfDot));
-            previousIndexOfDot = lastIndexOfDot + 1;
-            lastIndexOfDot = identifier.lastIndexOf(".");
-        }
-        return identifier;
     }
 
     private String translateIdentifier(String identifier) {
@@ -558,14 +540,15 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private void translateMethodDefination(ObjCParser.Method_typeContext method_typeContext, ObjCParser.Method_selectorContext method_selectorContext,
-                                           int startMethodBody, String methodPrefix, boolean shouldAddClassname) {
+                                           String sourceText, int startMethodBody, String methodPrefix, boolean shouldAddClassname) {
 
+        String sourceMethodTypeString = tokens.getText(method_typeContext.getSourceInterval());
         String methodTypeString = tokens.getText(method_typeContext.getSourceInterval());
         int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
         int endMethodType = startMethodType + methodTypeString.length();
 
         methodTypeString = methodPrefix + translateIdentifier(methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " "));
-        outputBuffer.replace(startMethodBody, endMethodType, methodTypeString);
+        writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString);
 
         String classNamePrefix = shouldAddClassname? className + "::" : "";
         String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
@@ -580,10 +563,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         } else {
             methodSignatures.add(finalMethodTypeNameParameterTypeAndNames);
         }
-        if(finalMethodTypeNameParameterTypeAndNames.contains("getAllCharacters")) {
-            System.out.println("Break");
-        }
-        outputBuffer.replace(startMethodSelector, endMethodSelector, finalMethodNameParameterTypeAndNames);
+        writeToOutputBuffer(startMethodSelector, endMethodSelector, sourceText, finalMethodNameParameterTypeAndNames);
     }
 
     private String translateMethodNameParameterTypeAndNames(ObjCParser.Method_selectorContext methodSelectorContext) {
@@ -616,12 +596,17 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateKeywords(String source) {
         //Final set of translations to get rid of the imports and supers and self and nil.
+        for (final String key : Collections.list(sourceVsDestinationText.keys())) {
+            while(source.contains(key)) {
+                source = source.replace(key, sourceVsDestinationText.get(key));
+            }
+        }
+
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, superClassName + STATIC_INVOCATION_OPERATOR);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
         for (final String key : Collections.list(KEYWORDS_VS_TRANSLATIONS.keys())) {
             source = source.replaceAll(key, KEYWORDS_VS_TRANSLATIONS.get(key));
         }
-
         return source;
     }
 
@@ -671,5 +656,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
         finalPrivateMethodsDeclaration += "\n";
         return finalPrivateMethodsDeclaration;
+    }
+
+    private void writeToOutputBuffer(int startIndex, int endIndex, String sourceText, String destinationText) {
+        outputBuffer.replace(startIndex, endIndex, destinationText);
+        sourceVsDestinationText.put(sourceText, destinationText);
     }
 }
