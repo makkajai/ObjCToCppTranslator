@@ -60,6 +60,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CGPOINT, Types.VEC2);
         TYPES_VS_TRANSLATIONS.put(Types.CGSIZE, Types.SIZE);
         TYPES_VS_TRANSLATIONS.put(Types.CGRECT, Types.RECT);
+        TYPES_VS_TRANSLATIONS.put(Types.NSUINTEGER, Types.INT);
+        TYPES_VS_TRANSLATIONS.put(Types.UP_FLOAT, Types.FLOAT);
+        TYPES_VS_TRANSLATIONS.put(Types.NSDICTIONARY, Types.DICTIONARY);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
@@ -349,10 +352,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String type = tokens.getText(ctx.struct_declaration().specifier_qualifier_list());
         String variable = tokens.getText(ctx.struct_declaration().struct_declarator_list());
-        String finalPropertyText = CC_SYNTHESIZE + translateIdentifier(type);
+        String finalPropertyText = "";
 
         if(variable.contains(ASTERISK)) {
-            finalPropertyText += ASTERISK;
+            finalPropertyText += CC_SYNTHESIZE + translateIdentifier(type) + ASTERISK;
+        } else {
+            finalPropertyText += CC_SYNTHESIZE_PASS_BY_REF + translateIdentifier(type);
         }
 
         String transformedVariable = variable.replace('*', ' ').trim();
@@ -652,7 +657,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private String translatePrivateMethodsDeclaration() {
         String finalPrivateMethodsDeclaration = "private: \n";
         for (final String methodDeclaration : methodSignatures) {
-            finalPrivateMethodsDeclaration += "\n" + methodDeclaration;
+            finalPrivateMethodsDeclaration += "\n" + methodDeclaration + ";";
         }
         finalPrivateMethodsDeclaration += "\n";
         return finalPrivateMethodsDeclaration;

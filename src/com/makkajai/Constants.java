@@ -15,6 +15,7 @@ public class Constants {
 
     public static final String COCOS2D = "cocos2d" + STATIC_INVOCATION_OPERATOR;
     public static final String CC_SYNTHESIZE = "CC_SYNTHESIZE(";
+    public static final String CC_SYNTHESIZE_PASS_BY_REF = "CC_SYNTHESIZE_PASS_BY_REF(";
     public static final String ASTERISK = "*";
 
 
@@ -70,6 +71,15 @@ public class Constants {
 
         public static final String CGRECT = "CGRect";
         public static final String RECT = COCOS2D + "Rect";
+
+        public static final String NSUINTEGER = "NSUInteger";
+        public static final String INT = "int";
+
+        public static final String UP_FLOAT = "Float";
+        public static final String FLOAT = "float";
+
+        public static final String NSDICTIONARY = "NSDictionary";
+        public static final String DICTIONARY = "__Dictionary";
     }
 
     public static class Methods {
