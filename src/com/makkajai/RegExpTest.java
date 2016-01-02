@@ -69,6 +69,4 @@ public class RegExpTest {
             System.out.println("Matcher: " + matcher.group(i));
         }
     }
-
-
 }

@@ -80,73 +80,50 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         methodSignatures = new ArrayList<String>();
     }
 
-
-    /**
-     * Main Method
-     *
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
-        String fileName =
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/ParentScene"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase"
-;
-        translateFile(fileName + H , false);
-        translateFile(fileName + M, true);
-        translateFile(fileName + H, true);
+    public void translateFile(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
+        initializeVariables(fileNameWithPath, shouldCreateOutput);
+        startParsing();
+        writeOutput(shouldCreateOutput);
     }
 
-    private static void translateFile(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
+    private void initializeVariables(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
         //The input file to parse!
         File file = new File(fileNameWithPath);
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        ANTLRInputStream input = new ANTLRInputStream(fileInputStream);
-
-        //The instance of the translator.
-        ObjCToCppTranslator visitor = new ObjCToCppTranslator();
-
-        visitor.fileName = file.getName();
-
+        fileName = file.getName();
         //Getting the lexer.
-        ObjCLexer lexer = new ObjCLexer(input);
+        ObjCLexer lexer = new ObjCLexer(new ANTLRInputStream(new FileInputStream(file)));
 
         //This is the single most important guy.  Useful in getting the source set of tokens and stuff.
-        visitor.tokens = new CommonTokenStream(lexer);
+        tokens = new CommonTokenStream(lexer);
+        outputBuffer = new StringBuilder().append(tokens.getText());
+        sourceVsDestinationText = new Hashtable<String, String>();
 
-        //Parser obviously.
-        ObjCParser parser = new ObjCParser(visitor.tokens);
-        ParseTree tree = parser.translation_unit();
-        visitor.outputBuffer = new StringBuilder()
-                .append(visitor.tokens.getText());
-
-        visitor.sourceVsDestinationText = new Hashtable<String, String>();
-        if(!visitor.isHeaderFile()) {
+        if(!isHeaderFile()) {
             instanceVariables.clear();
         }
-        if(visitor.isHeaderFile() && !shouldCreateOutput) {
+        if(isHeaderFile() && !shouldCreateOutput) {
             methodSignatures.clear();
         }
+    }
 
+    private void startParsing() {
+        //Parser obviously.
+        ObjCParser parser = new ObjCParser(tokens);
+        ParseTree tree = parser.translation_unit();
         //This is where the entire file is parsed and appropreat callbacks are made to parse the input file.
-        visitor.visit(tree);
+        visit(tree);
+    }
 
+    private void writeOutput(boolean shouldCreateOutput) throws IOException {
         //All done, lets write the output buffer to the output file and get done with it!
         if(shouldCreateOutput) {
             String outputFileName =
-                    visitor.isHeaderFile()?
-                        "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1" :
-                        "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp";
+                    isHeaderFile()?
+                            "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h1" :
+                            "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.cpp";
             FileWriter outputFile = new FileWriter(outputFileName);
-            outputFile.write(visitor.translateKeywords(visitor.getFileHeader() + visitor.outputBuffer.toString()));
+            outputFile.write(translateKeywords(getFileHeader() + outputBuffer.toString()));
             outputFile.flush();
             outputFile.close();
         }
