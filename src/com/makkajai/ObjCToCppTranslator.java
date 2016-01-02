@@ -243,11 +243,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitClass_implementation(ctx);
 
         isProtocol = false;
-        className = translateIdentifier(ctx.class_name().getText());
+        String originalClassName = ctx.class_name().getText();
+        className = translateIdentifier(originalClassName);
         superClassName = ctx.superclass_name() != null ? ctx.superclass_name().getText() : superClassName;
-        int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
+        int startClassNameIndex = outputBuffer.indexOf(originalClassName, startIndex);
 
-        int endClassNameIndex = startClassNameIndex + className.length();
+        int endClassNameIndex = startClassNameIndex + originalClassName.length();
 
         outputBuffer
                 .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(), EMPTY_STRING)
