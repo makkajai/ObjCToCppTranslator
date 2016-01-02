@@ -35,6 +35,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private StringBuilder outputBuffer;
     private boolean isProcessingInstanceMethod;
     private Dictionary<String, String> sourceVsDestinationText;
+    private boolean isProtocol;
 
     static {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, Keywords.BASE);
@@ -74,6 +75,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         methodSignatures = new ArrayList<String>();
     }
 
+
     /**
      * Main Method
      *
@@ -86,7 +88,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
@@ -106,7 +109,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
@@ -205,6 +209,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(startIndex < 0)
             return super.visitProtocol_declaration(ctx);
 
+        isProtocol = true;
         className = ctx.protocol_name().IDENTIFIER().getText();
         superClassName = null;
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
@@ -233,6 +238,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(startIndex < 0)
             return super.visitClass_interface(ctx);
 
+        isProtocol = false;
         className = ctx.class_name().IDENTIFIER().getText();
         superClassName = ctx.superclass_name().IDENTIFIER().getText();
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
@@ -263,6 +269,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(startIndex < 0)
             return super.visitClass_implementation(ctx);
 
+        isProtocol = false;
         className = translateIdentifier(ctx.class_name().getText());
         superClassName = ctx.superclass_name() != null ? ctx.superclass_name().getText() : superClassName;
         int startClassNameIndex = outputBuffer.indexOf(className, startIndex);
@@ -664,7 +671,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             finalParameters += translateIdentifier(sourceType.replaceAll("\\(", "").replaceAll("\\)", "")) + " " + sourceParameter;
         }
 
-        return finalMethodName + "(" + finalParameters + ")";
+        return finalMethodName + "(" + finalParameters + ")" + (isProtocol? PURE_VIRTUAL_METHOD_POSTFIX : "");
     }
 
     private String translateKeywords(String source) {
