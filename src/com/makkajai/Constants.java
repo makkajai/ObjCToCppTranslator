@@ -86,6 +86,9 @@ public class Constants {
 
         public static final String NSDICTIONARY = "NSDictionary";
         public static final String DICTIONARY = "__Dictionary";
+
+        public static final String CCTOUCHEVENT = "CCTouchEvent";
+        public static final String EVENT = COCOS2D + "Event";
     }
 
     public static class Methods {
