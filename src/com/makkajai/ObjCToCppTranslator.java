@@ -477,16 +477,18 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String variableNameWithRef = variableName + "_ref";
 
         //Please forgive me for this ugly code to also take care of intend.
+        String variableType = translateIdentifier(tokens.getText(ctx.type_variable_declarator().declaration_specifiers()));
+        String pointerText = ctx.type_variable_declarator().declarator().pointer() != null ?
+                tokens.getText(ctx.type_variable_declarator().declarator().pointer()) : "";
         String finalForLoop =
                 Types.REF_POINTER + " " + variableNameWithRef + ";"
                         + whitespaceSeparator
                         + CCARRAY_FOREACH + tokens.getText(ctx.expression()) + ", "
                         + variableNameWithRef + ") {\n"
                         + whitespaceSeparatorInLoop
-                        + tokens.getText(ctx.type_variable_declarator()) + " = dynamic_cast<"
-                        + tokens.getText(ctx.type_variable_declarator().declaration_specifiers())
-                        + (ctx.type_variable_declarator().declarator().pointer() != null ?
-                            tokens.getText(ctx.type_variable_declarator().declarator().pointer()) : "")
+                        + variableType + " " + pointerText + variableName + DYNAMIC_CAST
+                        + variableType
+                        + pointerText
                         + ">(" + variableNameWithRef + ");";
 
 
@@ -497,9 +499,20 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateIdentifier(String identifier) {
         if(identifier == null) return null;
-        Pattern pattern = Pattern.compile(BEGINS_WITH_2_UPPER_CASE_LETTERS);
-        Matcher matcher = pattern.matcher(identifier);
-        boolean matches = matcher.matches();
+        Pattern beginsWithUpperCaseLetters = Pattern.compile(BEGINS_WITH_2_UPPER_CASE_LETTERS);
+        Pattern beginsWithId = Pattern.compile(BEGINS_WITH_ID);
+        Matcher matcherForUpperCaseLetters = beginsWithUpperCaseLetters.matcher(identifier);
+        Matcher matcherForId = beginsWithId.matcher(identifier);
+        boolean matchesUpperCaseLetters = matcherForUpperCaseLetters.matches();
+        boolean matchesId = matcherForId.matches();
+
+        if(identifier.contains("<") && !matchesId) {
+            System.out.println("Breat");
+        }
+        if(matchesId) {
+            String protocolName = matcherForId.group(1);
+            return translateIdentifier(protocolName) + " * ";
+        }
 
         for (final String key : Collections.list(TYPES_VS_TRANSLATIONS.keys())) {
             if(identifier.startsWith(key)) {
@@ -508,10 +521,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         if(identifier.startsWith(CC)) {
-            return COCOS2D + matcher.group(2);
+            return COCOS2D + matcherForUpperCaseLetters.group(2);
         }
-        if(matches) {
-            return matcher.group(2);
+        if(matchesUpperCaseLetters) {
+            return matcherForUpperCaseLetters.group(2);
         }
 
         if(identifier.startsWith(Keywords.SELF) && !isProcessingInstanceMethod) {

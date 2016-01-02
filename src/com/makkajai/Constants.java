@@ -9,6 +9,7 @@ public class Constants {
     public static final String INSTANCE_INVOCATION_OPERATOR = "->";
     public static final String H = ".h";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
+    public static final String BEGINS_WITH_ID = "id\\W*<([A-Za-z]+)>\\W*";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
     public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "(\\_\\_)?([A-Z]{1})(.*)";
     public static final String CC = "CC";
@@ -18,6 +19,7 @@ public class Constants {
     public static final String CC_SYNTHESIZE_PASS_BY_REF = "CC_SYNTHESIZE_PASS_BY_REF(";
     public static final String ASTERISK = "*";
     public static final String CCARRAY_FOREACH = "CCARRAY_FOREACH(";
+    public static final String DYNAMIC_CAST = " = dynamic_cast<";
 
     public static class Keywords {
         public static final String SUPER = "super";
