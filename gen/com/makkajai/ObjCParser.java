@@ -39,7 +39,7 @@ public class ObjCParser extends Parser {
 		IDENTIFIER=127, CHARACTER_LITERAL=128, STRING_LITERAL=129, HEX_LITERAL=130, 
 		DECIMAL_LITERAL=131, OCTAL_LITERAL=132, FLOATING_POINT_LITERAL=133, IMPORT=134, 
 		INCLUDE=135, PRAGMA=136, WS=137, COMMENT=138, LINE_COMMENT=139, HDEFINE=140, 
-		HIF=141, HELSE=142, HUNDEF=143, HIFNDEF=144, HENDIF=145;
+		HIF=141, HELIF=142, HELSE=143, HUNDEF=144, HIFNDEF=145, HENDIF=146;
 	public static final int
 		RULE_translation_unit = 0, RULE_external_declaration = 1, RULE_preprocessor_declaration = 2, 
 		RULE_class_interface = 3, RULE_category_interface = 4, RULE_class_implementation = 5, 
@@ -163,7 +163,7 @@ public class ObjCParser extends Parser {
 		"READONLY", "READWRITE", "WEAK", "IDENTIFIER", "CHARACTER_LITERAL", "STRING_LITERAL", 
 		"HEX_LITERAL", "DECIMAL_LITERAL", "OCTAL_LITERAL", "FLOATING_POINT_LITERAL", 
 		"IMPORT", "INCLUDE", "PRAGMA", "WS", "COMMENT", "LINE_COMMENT", "HDEFINE", 
-		"HIF", "HELSE", "HUNDEF", "HIFNDEF", "HENDIF"
+		"HIF", "HELIF", "HELSE", "HUNDEF", "HIFNDEF", "HENDIF"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -9477,7 +9477,7 @@ public class ObjCParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\u0093\u0552\4\2\t"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\u0094\u0552\4\2\t"+
 		"\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+

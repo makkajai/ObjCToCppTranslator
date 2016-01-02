@@ -89,6 +89,12 @@ public class Constants {
 
         public static final String CCTOUCHEVENT = "CCTouchEvent";
         public static final String EVENT = COCOS2D + "Event";
+
+        public static final String CCACTIONCALLFUNC = "CCActionCallFunc";
+        public static final String CALLFUNC = COCOS2D + "CallFunc";
+
+        public static final String CCACTIONCALLFUNCO = "CCActionCallFuncO";
+        public static final String CCCALLFUNCO = COCOS2D + "__CCCallFuncO";
     }
 
     public static class Methods {

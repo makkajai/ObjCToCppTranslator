@@ -66,6 +66,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.UP_FLOAT, Types.FLOAT);
         TYPES_VS_TRANSLATIONS.put(Types.NSDICTIONARY, Types.DICTIONARY);
         TYPES_VS_TRANSLATIONS.put(Types.CCTOUCHEVENT, Types.EVENT);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNC, Types.CALLFUNC);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNCO, Types.CCCALLFUNCO);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
@@ -91,7 +93,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
         , false);
@@ -100,7 +103,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.m"
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
@@ -112,7 +116,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.h"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
 //                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
         , true);
@@ -465,6 +470,23 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         writeToOutputBuffer(start, end, sourceText, finalMethod, true);
         return super.visitMessage_expression(ctx);
+    }
+
+    @Override
+    public Void visitSelector_expression(ObjCParser.Selector_expressionContext ctx) {
+        String sourceText = tokens.getText(ctx.getSourceInterval());
+        int start = outputBuffer.indexOf(sourceText);
+        if(start < 0) {
+            return super.visitSelector_expression(ctx);
+        }
+
+        if(sourceText.contains("selectUserPopup:is")) {
+            System.out.println("Break");
+        }
+
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, className + STATIC_INVOCATION_OPERATOR + tokens.getText(ctx.selector_name()), true);
+
+        return super.visitSelector_expression(ctx);
     }
 
     @Override
