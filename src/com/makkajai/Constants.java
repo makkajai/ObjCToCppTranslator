@@ -1,11 +1,18 @@
 package com.makkajai;
 
+/**
+ * Constants - The constants used through out the code.
+ * (c) 2015 Makkajai
+ * @author Deep Shah
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
 public class Constants {
 
     public static final String STATIC_INVOCATION_OPERATOR = "::";
     public static final String INSTANCE_INVOCATION_OPERATOR = "->";
     public static final String H = ".h";
     public static final String M = ".m";
+    public static final String CPP = ".cpp";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
     public static final String BEGINS_WITH_ID = "id\\W*<([A-Za-z]+)>\\W*";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
@@ -22,6 +29,8 @@ public class Constants {
     public static final String PURE_VIRTUAL_METHOD_POSTFIX = " = 0";
     public static final String CC_CALLBACK = "CC_CALLBACK_";
     public static final String EMPTY_STRING = "";
+    public static final String FILE_NAME_WITH_H_OR_M = "(.*\\.h)|(.*\\.m)";
+    public static final String H_OR_M = "(.h)|(.m)";
 
     public static class Keywords {
         public static final String SUPER = "super";

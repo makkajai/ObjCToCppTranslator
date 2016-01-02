@@ -9,7 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by administrator on 26/12/15.
+ * RegExpTest - A class to test out a few regular expressions.
+ * (c) 2015 Makkajai
+ * @author Deep Shah
+ * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 public class RegExpTest {
 
