@@ -165,7 +165,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             if(i > 0) {
                 headerFileName += "/";
             }
-            headerFileName += translateIdentifier(parts[i]);
+            headerFileName += parts[i];
         }
         headerFileName += (isWithAngleBrackets? ">" : "\"") + "\n";
         writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName, true);
