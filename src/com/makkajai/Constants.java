@@ -99,7 +99,18 @@ public class Constants {
         public static final String CALLFUNC = COCOS2D + "CallFunc";
 
         public static final String CCACTIONCALLFUNCO = "CCActionCallFuncO";
-        public static final String CCCALLFUNCO = COCOS2D + "__CCCallFuncO";
+        public static final String CALLFUNCO = COCOS2D + "__CCCallFuncO";
+
+        public static final String CCACTIONCALLBLOCK = "CCActionCallBlock";
+
+        public static final String CCACTIONDELAY = "CCActionDelay";
+        public static final String DELAYTIME = COCOS2D + "DelayTime";
+
+        public static final String CCACTIONSEQUENCE = "CCActionSequence";
+        public static final String SEQUENCE = COCOS2D + "Sequence";
+
+        public static final String CCCOLOR = "CCColor";
+        public static final String MAKKAJAICOLOR = "MakkajaiColor";
     }
 
     public static class Methods {
@@ -114,6 +125,14 @@ public class Constants {
 
         public static final String CG_SIZE_MAKE = "CGSizeMake";
         public static final String SIZE = COCOS2D + "Size";
+
+        public static final String ACTIONWITHBLOCK = "actionWithBlock";
+        public static final String ACTIONWITHDURATION = "actionWithDuration";
+
+        public static final String CREATE = "create";
+
+        public static final String ACTIONONETWO = "actionOneTwo";
+        public static final String CREATEWITHTWOACTIONS = "createWithTwoActions";
 
     }
 }

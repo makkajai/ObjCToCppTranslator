@@ -53,6 +53,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
+        KEYWORDS_VS_TRANSLATIONS.put(Methods.ACTIONONETWO, Methods.CREATEWITHTWOACTIONS);
 
         TYPES_VS_TRANSLATIONS.put(Types.NS_OBJECT, Types.REF);
         TYPES_VS_TRANSLATIONS.put(Types.NS_STRING, Types.STRING);
@@ -69,12 +70,19 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.NSDICTIONARY, Types.DICTIONARY);
         TYPES_VS_TRANSLATIONS.put(Types.CCTOUCHEVENT, Types.EVENT);
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNC, Types.CALLFUNC);
-        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNCO, Types.CCCALLFUNCO);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNCO, Types.CALLFUNCO);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLBLOCK, Types.CALLFUNC);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONDELAY, Types.DELAYTIME);
+        TYPES_VS_TRANSLATIONS.put(Types.CCACTIONSEQUENCE, Types.SEQUENCE);
+        TYPES_VS_TRANSLATIONS.put(Types.CCCOLOR, Types.MAKKAJAICOLOR);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         METHODS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         METHODS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
+        METHODS_VS_TRANSLATIONS.put(Methods.ACTIONWITHBLOCK, Methods.CREATE);
+        METHODS_VS_TRANSLATIONS.put(Methods.ACTIONWITHDURATION, Methods.CREATE);
+        METHODS_VS_TRANSLATIONS.put(Methods.ACTIONONETWO, Methods.CREATEWITHTWOACTIONS);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
