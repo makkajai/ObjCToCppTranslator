@@ -196,7 +196,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             headerFileName += translateIdentifier(parts[i]);
         }
         headerFileName += (isWithAngleBrackets? ">" : "\"") + "\n";
-        writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName);
+        writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName, true);
 
         return super.visitPreprocessor_declaration(ctx);
     }
@@ -389,7 +389,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String transformedVariable = variable.replace('*', ' ').trim();
         finalPropertyText += ", " + transformedVariable + ", " + toUpperFirstLetter(transformedVariable) + ");";
 
-        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalPropertyText);
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalPropertyText, true);
 
         return super.visitProperty_declaration(ctx);
     }
@@ -416,7 +416,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         if(!isHeaderFile()) {
-            writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, "");
+            writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, "", true);
             return super.visitInstance_variables(ctx);
         }
 
@@ -427,7 +427,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         finalInstanceVariables += "\npublic:";
 
-        writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, finalInstanceVariables);
+        writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, finalInstanceVariables, true);
 
 
         return super.visitInstance_variables(ctx);
@@ -446,7 +446,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int startDeclarationSpecifier = outputBuffer.indexOf(sourceDeclaration, start);
 
         writeToOutputBuffer(startDeclarationSpecifier, startDeclarationSpecifier + declarationSpecifierSourceText.length(),
-                declarationSpecifierSourceText, translateIdentifier(declarationSpecifierSourceText));
+                declarationSpecifierSourceText, translateIdentifier(declarationSpecifierSourceText), false);
         return super.visitDeclaration(ctx);
     }
 
@@ -463,7 +463,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String finalMethod = "(" + receiver + translateInvocationOperator(receiver);
         finalMethod += translateMethodNameAndParameters(ctx.message_selector()) + ")";
 
-        writeToOutputBuffer(start, end, sourceText, finalMethod);
+        writeToOutputBuffer(start, end, sourceText, finalMethod, true);
         return super.visitMessage_expression(ctx);
     }
 
@@ -488,7 +488,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 finalExpression += nodeText;
             }
         }
-        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression);
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression, true);
         return super.visitPostfix_expression(ctx);
     }
 
@@ -528,7 +528,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                         + ">(" + variableNameWithRef + ");";
 
 
-        writeToOutputBuffer(startForLoop, startForLoop + sourceForLoop.length(), sourceForLoop, finalForLoop + sourceForLoop.substring(indexOfFirstNewLine));
+        writeToOutputBuffer(startForLoop, startForLoop + sourceForLoop.length(), sourceForLoop, finalForLoop + sourceForLoop.substring(indexOfFirstNewLine), true);
 
         return super.visitFor_in_statement(ctx);
     }
@@ -626,7 +626,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int endMethodType = startMethodType + methodTypeString.length();
 
         methodTypeString = methodPrefix + translateIdentifier(methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " "));
-        writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString);
+        writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString, false);
 
         String classNamePrefix = shouldAddClassname? className + "::" : "";
         String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
@@ -641,7 +641,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         } else {
             methodSignatures.add(finalMethodTypeNameParameterTypeAndNames);
         }
-        writeToOutputBuffer(startMethodSelector, endMethodSelector, sourceText, finalMethodNameParameterTypeAndNames);
+        writeToOutputBuffer(startMethodSelector, endMethodSelector, sourceText, finalMethodNameParameterTypeAndNames, true);
     }
 
     private String translateMethodNameParameterTypeAndNames(ObjCParser.Method_selectorContext methodSelectorContext) {
@@ -750,8 +750,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         return finalPrivateMethodsDeclaration;
     }
 
-    private void writeToOutputBuffer(int startIndex, int endIndex, String sourceText, String destinationText) {
+    private void writeToOutputBuffer(int startIndex, int endIndex, String sourceText, String destinationText, boolean shouldWriteToDictionary) {
         outputBuffer.replace(startIndex, endIndex, destinationText);
-        sourceVsDestinationText.put(sourceText, destinationText);
+        if(shouldWriteToDictionary)
+            sourceVsDestinationText.put(sourceText, destinationText);
     }
 }
