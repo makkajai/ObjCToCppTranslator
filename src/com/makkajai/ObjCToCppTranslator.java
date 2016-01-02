@@ -174,6 +174,44 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitClass_list(ObjCParser.Class_listContext ctx) {
+        String classListText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classListText);
+
+        if(startIndex < 0)
+            return super.visitClass_list(ctx);
+
+        List<ObjCParser.Class_nameContext> class_nameContexts = ctx.class_name();
+        for (ObjCParser.Class_nameContext classNameContext : class_nameContexts) {
+            String sourceClassName = tokens.getText(classNameContext);
+            String translatedClassName = translateIdentifier(sourceClassName);
+            int startClassNameIndex = outputBuffer.indexOf(sourceClassName, startIndex);
+            writeToOutputBuffer(startClassNameIndex, startClassNameIndex + sourceClassName.length(), sourceClassName, translatedClassName, true);
+        }
+
+        return super.visitClass_list(ctx);
+    }
+
+    @Override
+    public Void visitProtocol_declaration_list(ObjCParser.Protocol_declaration_listContext ctx) {
+        String protocolListText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(protocolListText);
+
+        if(startIndex < 0)
+            return super.visitProtocol_declaration_list(ctx);
+
+        List<ObjCParser.Protocol_nameContext> protocol_nameContexts = ctx.protocol_list().protocol_name();
+        for (ObjCParser.Protocol_nameContext protocolNameContext : protocol_nameContexts) {
+            String sourceClassName = tokens.getText(protocolNameContext);
+            String translatedClassName = translateIdentifier(sourceClassName);
+            int startClassNameIndex = outputBuffer.indexOf(sourceClassName, startIndex);
+            writeToOutputBuffer(startClassNameIndex, startClassNameIndex + sourceClassName.length(), sourceClassName, translatedClassName, true);
+        }
+
+        return super.visitProtocol_declaration_list(ctx);
+    }
+
+    @Override
     public Void visitProtocol_declaration(ObjCParser.Protocol_declarationContext ctx) {
         String protocolInterfaceText = tokens.getText(ctx.getSourceInterval());
         int startIndex = outputBuffer.indexOf(protocolInterfaceText);
