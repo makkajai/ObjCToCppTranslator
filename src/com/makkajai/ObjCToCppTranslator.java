@@ -48,6 +48,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.NO, Keywords.FALSE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_QUOTE, Keywords.QUOTE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.PERCENTAGE_QUOTE, Keywords.PERCENTAGE_S);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_CLASS, Keywords.CLASS);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_PROTOCOL, Keywords.CLASS);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);

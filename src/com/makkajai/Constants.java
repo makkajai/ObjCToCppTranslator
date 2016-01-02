@@ -47,6 +47,11 @@ public class Constants {
         public static final String QUOTE = "\"";
         public static final String PERCENTAGE_QUOTE = "%@";
         public static final String PERCENTAGE_S = "%s";
+
+        public static final String AT_CLASS = "@class";
+        public static final String AT_PROTOCOL = "@protocol";
+
+        public static final String CLASS = "class";
     }
 
     public static class Types {
