@@ -120,6 +120,8 @@ public class Constants {
 
         public static final String CCCOLOR = "CCColor";
         public static final String MAKKAJAICOLOR = "MakkajaiColor";
+
+        public static final String INSTANCETYPE = "instancetype";
     }
 
     public static class Methods {

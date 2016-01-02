@@ -374,7 +374,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         int start = outputBuffer.indexOf(sourceText);
         if(start < 0) {
-            super.visitProperty_declaration(ctx);
+            return super.visitProperty_declaration(ctx);
         }
 
         String type = tokens.getText(ctx.struct_declaration().specifier_qualifier_list());
@@ -705,6 +705,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, superClassName + STATIC_INVOCATION_OPERATOR);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
+        KEYWORDS_VS_TRANSLATIONS.put(Types.INSTANCETYPE, className + " " + ASTERISK);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
         for (final String key : Collections.list(KEYWORDS_VS_TRANSLATIONS.keys())) {
             source = source.replaceAll(key, KEYWORDS_VS_TRANSLATIONS.get(key));

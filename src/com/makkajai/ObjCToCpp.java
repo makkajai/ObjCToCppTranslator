@@ -66,24 +66,39 @@ public class ObjCToCpp {
                 if(nextFileIsM(currentFile, files, i)) {
                     translateFileInput.dryRun = true;
                     visitor.translateFile(translateFileInput);
+                    Date stopTime = new Date();
+                    System.out.println("Dry run File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime, stopTime));
 
+                    Date startTime1 = new Date();
                     translateFileInput.filePathRelativeToInput = filePathRelativeToInput.replace(H, M);
                     translateFileInput.dryRun = false;
                     visitor.translateFile(translateFileInput);
+                    stopTime = new Date();
+                    System.out.println("Processed File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime1, stopTime));
 
+                    Date startTime2 = new Date();
                     translateFileInput.filePathRelativeToInput = filePathRelativeToInput;
                     translateFileInput.dryRun = false;
                     visitor.translateFile(translateFileInput);
+                    stopTime = new Date();
+                    System.out.println("Processed File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
                     i+=2;
                     continue;
                 }
                 visitor.translateFile(translateFileInput);
                 i++;
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("###########################Continuing with the next set of files##########################");
             } finally {
                 Date stopTime = new Date();
-                System.out.println("Processed File(s): " + filePathRelativeToInput + " Time Taken: " + (stopTime.getTime() - startTime.getTime())/1000L);
+                System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
             }
         }
+    }
+
+    private static double getDelta(Date startTime, Date stopTime) {
+        return (stopTime.getTime() - startTime.getTime()) / 1000.0d;
     }
 
     private static boolean nextFileIsM(File currentFile, List<File> files, int i) {
