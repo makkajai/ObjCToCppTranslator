@@ -20,6 +20,7 @@ public class Constants {
     public static final String ASTERISK = "*";
     public static final String CCARRAY_FOREACH = "CCARRAY_FOREACH(";
     public static final String DYNAMIC_CAST = " = dynamic_cast<";
+    public static final String CLASS = "class ";
 
     public static class Keywords {
         public static final String SUPER = "super";
