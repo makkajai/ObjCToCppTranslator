@@ -1,13 +1,11 @@
 package com.makkajai;
 
-/**
- * Created by administrator on 31/12/15.
- */
 public class Constants {
 
     public static final String STATIC_INVOCATION_OPERATOR = "::";
     public static final String INSTANCE_INVOCATION_OPERATOR = "->";
     public static final String H = ".h";
+    public static final String M = ".m";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
     public static final String BEGINS_WITH_ID = "id\\W*<([A-Za-z]+)>\\W*";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
@@ -22,6 +20,8 @@ public class Constants {
     public static final String DYNAMIC_CAST = " = dynamic_cast<";
     public static final String CLASS = "class ";
     public static final String PURE_VIRTUAL_METHOD_POSTFIX = " = 0";
+    public static final String CC_CALLBACK = "CC_CALLBACK_";
+    public static final String EMPTY_STRING = "";
 
     public static class Keywords {
         public static final String SUPER = "super";

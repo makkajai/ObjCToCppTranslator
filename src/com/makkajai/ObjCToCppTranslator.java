@@ -88,41 +88,20 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        translateFile(
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
-        , false);
-        translateFile(
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
-////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
-        , true);
-        translateFile(
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character.h"
-                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView.h"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.m"
-//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase.h"
-        , true);
+        String fileName =
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiUtil"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Home"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/PlayStrategy"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Characters/Character"
+                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Activities/gnumchmenu/GnumchScene"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/ParentScene"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/BaseSkillView"
+//                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/YDLayerBase"
+;
+        translateFile(fileName + H , false);
+        translateFile(fileName + M, true);
+        translateFile(fileName + H, true);
     }
 
     private static void translateFile(String fileNameWithPath, boolean shouldCreateOutput) throws IOException {
@@ -183,7 +162,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         int endIndex = startIndex + importText.length();
 
-        String fileToImport = importText.replaceAll(Keywords.IMPORT, "");
+        String fileToImport = importText.replaceAll(Keywords.IMPORT, EMPTY_STRING);
 
         Pattern pattern = Pattern.compile("((\"(.*)\")|(<(.*)>))\\W");
         Matcher matcher = pattern.matcher(fileToImport);
@@ -223,7 +202,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
-        String suffix = (indexOfBrace >= 0)? "" : "{";
+        String suffix = (indexOfBrace >= 0)? EMPTY_STRING : "{";
 
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
@@ -252,7 +231,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
-        String suffix = (indexOfBrace >= 0)? "" : "{";
+        String suffix = (indexOfBrace >= 0)? EMPTY_STRING : "{";
 
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
@@ -285,7 +264,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int endClassNameIndex = startClassNameIndex + className.length();
 
         outputBuffer
-                .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(), "")
+                .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(), EMPTY_STRING)
                 .replace(startIndex, endClassNameIndex, USING_NS_CC);
 
         className = translateIdentifier(className);
@@ -375,6 +354,35 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitBlock_expression(ObjCParser.Block_expressionContext ctx) {
+        String sourceText = tokens.getText(ctx);
+
+        int start = outputBuffer.indexOf(sourceText);
+        if(start < 0) {
+            super.visitBlock_expression(ctx);
+        }
+
+        int indexOfBrace = sourceText.indexOf("{");
+
+        String finalParameterTypeAndName = EMPTY_STRING;
+
+        List<ObjCParser.Type_variable_declaratorContext> typeVariableDeclaratorContexts =
+                ctx.block_parameters() == null? new ArrayList<ObjCParser.Type_variable_declaratorContext>()
+                        : ctx.block_parameters().type_variable_declarator();
+        for(ObjCParser.Type_variable_declaratorContext typeVariableDeclaratorContext : typeVariableDeclaratorContexts) {
+            VariableTypeNameInfo variableTypeNameInfo = translateTypeVariableDeclarator(typeVariableDeclaratorContext);
+            if(!finalParameterTypeAndName.equals(EMPTY_STRING)) {
+                finalParameterTypeAndName += ", ";
+            }
+            finalParameterTypeAndName += variableTypeNameInfo.variableType + variableTypeNameInfo.pointer + " " + variableTypeNameInfo.variableName;
+        }
+
+        writeToOutputBuffer(start, start + indexOfBrace, sourceText.substring(0, indexOfBrace), "[] (" + finalParameterTypeAndName + ") ", true);
+
+        return super.visitBlock_expression(ctx);
+    }
+
+    @Override
     public Void visitProperty_declaration(ObjCParser.Property_declarationContext ctx) {
         String sourceText = tokens.getText(ctx);
 
@@ -385,7 +393,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String type = tokens.getText(ctx.struct_declaration().specifier_qualifier_list());
         String variable = tokens.getText(ctx.struct_declaration().struct_declarator_list());
-        String finalPropertyText = "";
+        String finalPropertyText = EMPTY_STRING;
 
         if(variable.contains(ASTERISK)) {
             finalPropertyText += CC_SYNTHESIZE + translateIdentifier(type) + ASTERISK;
@@ -423,7 +431,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         if(!isHeaderFile()) {
-            writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, "", true);
+            writeToOutputBuffer(start, start+sourceInstanceVariables.length(), sourceInstanceVariables, EMPTY_STRING, true);
             return super.visitInstance_variables(ctx);
         }
 
@@ -482,19 +490,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             return super.visitSelector_expression(ctx);
         }
 
-        if(sourceText.contains("selectUserPopup:is")) {
-            System.out.println("Break");
-        }
-
-        String macroToUse = "CC_CALLBACK_" + (sourceText.length() - sourceText.replace(":", "").length()) + "(";
+        String macroToUse = CC_CALLBACK + (sourceText.length() - sourceText.replace(":", EMPTY_STRING).length()) + "(";
         List<ObjCParser.SelectorContext> selectorParts = ctx.selector_name().selector();
-        String finalMethodName = "";
+        String finalMethodName = EMPTY_STRING;
         for (ObjCParser.SelectorContext selector : selectorParts) {
             String currentSelectorPart = tokens.getText(selector);
-            finalMethodName += finalMethodName.equals("")? translateMethodName(currentSelectorPart) : toUpperFirstLetter(currentSelectorPart);
+            finalMethodName += finalMethodName.equals(EMPTY_STRING)? translateMethodName(currentSelectorPart) : toUpperFirstLetter(currentSelectorPart);
         }
 
-        System.out.println(finalMethodName);
         writeToOutputBuffer(start, start + sourceText.length(), sourceText, macroToUse
                 + className + STATIC_INVOCATION_OPERATOR + finalMethodName + ", this)", true);
 
@@ -509,7 +512,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
 
-        String finalExpression = "";
+        String finalExpression = EMPTY_STRING;
         for (int i=0; i<ctx.children.size(); i++) {
             String nodeText = tokens.getText(ctx.children.get(i).getSourceInterval());
             if(ctx.children.get(i) instanceof ObjCParser.IdentifierContext) {
@@ -543,22 +546,21 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 sourceForLoop.substring(indexOfFirstNewLine + 1,
                         indexOfFirstNewLine + sourceForLoop.substring(indexOfFirstNewLine).length() - sourceForLoop.substring(indexOfFirstNewLine).trim().length());
 
-        String variableName = tokens.getText(ctx.type_variable_declarator().declarator().direct_declarator());
-        String variableNameWithRef = variableName + "_ref";
+
+        VariableTypeNameInfo variableTypeNameInfo = translateTypeVariableDeclarator(ctx.type_variable_declarator());
+
+        String variableNameWithRef = variableTypeNameInfo.variableName + "_ref";
 
         //Please forgive me for this ugly code to also take care of intend.
-        String variableType = translateIdentifier(tokens.getText(ctx.type_variable_declarator().declaration_specifiers()));
-        String pointerText = ctx.type_variable_declarator().declarator().pointer() != null ?
-                tokens.getText(ctx.type_variable_declarator().declarator().pointer()) : "";
         String finalForLoop =
                 Types.REF_POINTER + " " + variableNameWithRef + ";"
                         + whitespaceSeparator
                         + CCARRAY_FOREACH + tokens.getText(ctx.expression()) + ", "
                         + variableNameWithRef + ") {\n"
                         + whitespaceSeparatorInLoop
-                        + variableType + " " + pointerText + variableName + DYNAMIC_CAST
-                        + variableType
-                        + pointerText
+                        + variableTypeNameInfo.variableType + " " + variableTypeNameInfo.pointer + variableTypeNameInfo.variableName + DYNAMIC_CAST
+                        + variableTypeNameInfo.variableType
+                        + variableTypeNameInfo.pointer
                         + ">(" + variableNameWithRef + ");";
 
 
@@ -615,8 +617,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateInvocationOperator(String receiver) {
         Pattern pattern = Pattern.compile(BEGINS_WITH_UPPER_CASE_LETTERS);
-        Matcher matcher = pattern.matcher(receiver.replaceAll(COCOS2D, ""));
-        if(receiver.isEmpty()) return "";
+        Matcher matcher = pattern.matcher(receiver.replaceAll(COCOS2D, EMPTY_STRING));
+        if(receiver.isEmpty()) return EMPTY_STRING;
         else if(matcher.matches()) {
             //Looks like we are making a static call.
             return STATIC_INVOCATION_OPERATOR;
@@ -625,8 +627,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private String translateMethodNameAndParameters(ObjCParser.Message_selectorContext messageSelectorContext) {
-        String finalMethodName = "";
-        String finalParameters = "";
+        String finalMethodName = EMPTY_STRING;
+        String finalParameters = EMPTY_STRING;
 
         //If this is just a method with no keyword argument we need to get just the selector and use it as the method name.
         if(messageSelectorContext.keyword_argument().size() == 0) {
@@ -638,7 +640,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         for (int i = 0; i< messageSelectorContext.keyword_argument().size(); i++) {
             ObjCParser.Keyword_argumentContext keyword_argumentContext = messageSelectorContext.keyword_argument().get(i);
             ObjCParser.SelectorContext selector = keyword_argumentContext.selector();
-            String sourceMethod = selector == null? "" : tokens.getText(selector.getSourceInterval());
+            String sourceMethod = selector == null? EMPTY_STRING : tokens.getText(selector.getSourceInterval());
             String sourceParameter = tokens.getText(keyword_argumentContext.expression().getSourceInterval());
             if(i > 0) {
                 sourceMethod = toUpperFirstLetter(sourceMethod);
@@ -659,10 +661,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
         int endMethodType = startMethodType + methodTypeString.length();
 
-        methodTypeString = methodPrefix + translateIdentifier(methodTypeString.replaceAll("\\(", "").replaceAll("\\)", " "));
+        methodTypeString = methodPrefix + translateIdentifier(methodTypeString.replaceAll("\\(", EMPTY_STRING).replaceAll("\\)", " "));
         writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString, false);
 
-        String classNamePrefix = shouldAddClassname? className + "::" : "";
+        String classNamePrefix = shouldAddClassname? className + "::" : EMPTY_STRING;
         String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
         String finalMethodNameParameterTypeAndNames = classNamePrefix + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
         String finalMethodTypeNameParameterTypeAndNames = methodTypeString + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
@@ -679,8 +681,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private String translateMethodNameParameterTypeAndNames(ObjCParser.Method_selectorContext methodSelectorContext) {
-        String finalMethodName = "";
-        String finalParameters = "";
+        String finalMethodName = EMPTY_STRING;
+        String finalParameters = EMPTY_STRING;
 
         //If this is just a method with no keyword argument we need to get just the selector and use it as the method name.
         if(methodSelectorContext.keyword_declarator().size() == 0) {
@@ -692,7 +694,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         for (int i = 0; i< methodSelectorContext.keyword_declarator().size(); i++) {
             ObjCParser.Keyword_declaratorContext keyword_declaratorContext = methodSelectorContext.keyword_declarator().get(i);
             ObjCParser.SelectorContext selector = keyword_declaratorContext.selector();
-            String sourceMethod = selector == null? "" : tokens.getText(selector.getSourceInterval());
+            String sourceMethod = selector == null? EMPTY_STRING : tokens.getText(selector.getSourceInterval());
             String sourceType = tokens.getText(keyword_declaratorContext.method_type(0).getSourceInterval());
             String sourceParameter = tokens.getText(keyword_declaratorContext.IDENTIFIER().getSourceInterval());
             if(i > 0) {
@@ -700,10 +702,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 finalParameters += ", ";
             }
             finalMethodName += sourceMethod;
-            finalParameters += translateIdentifier(sourceType.replaceAll("\\(", "").replaceAll("\\)", "")) + " " + sourceParameter;
+            finalParameters += translateIdentifier(sourceType.replaceAll("\\(", EMPTY_STRING).replaceAll("\\)", EMPTY_STRING)) + " " + sourceParameter;
         }
 
-        return finalMethodName + "(" + finalParameters + ")" + (isProtocol? PURE_VIRTUAL_METHOD_POSTFIX : "");
+        return finalMethodName + "(" + finalParameters + ")" + (isProtocol? PURE_VIRTUAL_METHOD_POSTFIX : EMPTY_STRING);
     }
 
     private String translateKeywords(String source) {
@@ -739,7 +741,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private String getIfnDefForHeaderFiles() {
-        if(!isHeaderFile()) return "";
+        if(!isHeaderFile()) return EMPTY_STRING;
         return String.format("#ifndef __%s_H__\n#define __%s_H__\n\n", className.toUpperCase(), className.toUpperCase());
     }
 
@@ -748,7 +750,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 + " :" + translateSuperClassDeclaration(superClassName);
 
         if(protocol_reference_listContext != null) {
-            String separator = superClassName != null? "," : "";
+            String separator = superClassName != null? "," : EMPTY_STRING;
             List<ObjCParser.Protocol_nameContext> protocol_nameContexts = protocol_reference_listContext.protocol_list().protocol_name();
             for (ObjCParser.Protocol_nameContext protocol_nameContext : protocol_nameContexts) {
                 classDeclaration += separator + translateSuperClassDeclaration(translateIdentifier(protocol_nameContext.IDENTIFIER().getText()));
@@ -761,14 +763,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private String translateSuperClassDeclaration(String cName) {
         if (cName == null) {
-            return "";
+            return EMPTY_STRING;
         }
 
         return " public " + translateIdentifier(cName);
     }
 
     private String toUpperFirstLetter(final String sourceMethod) {
-        return sourceMethod != null && sourceMethod.length() > 0? sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1) : "";
+        return sourceMethod != null && sourceMethod.length() > 0? sourceMethod.substring(0, 1).toUpperCase() + sourceMethod.substring(1) : EMPTY_STRING;
     }
 
     private boolean isHeaderFile() {
@@ -788,5 +790,13 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         outputBuffer.replace(startIndex, endIndex, destinationText);
         if(shouldWriteToDictionary)
             sourceVsDestinationText.put(sourceText, destinationText);
+    }
+
+    private VariableTypeNameInfo translateTypeVariableDeclarator(ObjCParser.Type_variable_declaratorContext context) {
+        VariableTypeNameInfo variableTypeNameInfo = new VariableTypeNameInfo();
+        variableTypeNameInfo.variableName = tokens.getText(context.declarator().direct_declarator());
+        variableTypeNameInfo.variableType = translateIdentifier(tokens.getText(context.declaration_specifiers()));
+        variableTypeNameInfo.pointer = context.declarator().pointer() != null ? tokens.getText(context.declarator().pointer()) : EMPTY_STRING;
+        return variableTypeNameInfo;
     }
 }
