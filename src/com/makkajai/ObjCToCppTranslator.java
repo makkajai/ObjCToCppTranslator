@@ -61,9 +61,15 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.UP_FLOAT, Keywords.FLOAT);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONSPAWN_ACTIONS, Keywords.SPAWN_CREATE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONROTATEBY_CREATEANGLE, Keywords.ROTATEBY_CREATE);
-        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ROTATEBY_CREATE, Keywords.SCALEBY_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONSCALEBY_CREATESCALE, Keywords.SCALEBY_CREATE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SPRITE_SPRITEWITHIMAGENAMED, Keywords.SPRITE_CREATEWITHSPRITEFRAMENAME);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONEASEBOUNCEOUT_ACTIONWITHACTION, Keywords.EASEBOUNCEOUT_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SZWIN_GETWIDTH, Keywords.SZWIN_WIDTH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SZWIN_GETHEIGHT, Keywords.SZWIN_HEIGHT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETSZWIN_GETWIDTH, Keywords.GETSZWIN_WIDTH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETSZWIN_GETHEIGHT, Keywords.GETSZWIN_HEIGHT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETCONTENTSIZE_GETWIDTH, Keywords.GETCONTENTSIZE_WIDTH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETCONTENTSIZE_GETHEIGHT, Keywords.GETCONTENTSIZE_HEIGHT);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -101,6 +107,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.NODE, Methods.CREATE);
         METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDZ, Methods.ADDCHILD);
         METHODS_VS_TRANSLATIONS.put(Methods.SCHEDULEINTERVAL, Methods.SCHEDULE);
+        METHODS_VS_TRANSLATIONS.put(Methods.ALLOC, Methods.CREATE);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
@@ -401,7 +408,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         int start = outputBuffer.indexOf(sourceText);
         if(start < 0) {
-            super.visitBlock_expression(ctx);
+            return super.visitBlock_expression(ctx);
         }
 
         int indexOfBrace = sourceText.indexOf("{");
@@ -437,10 +444,13 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String variable = tokens.getText(ctx.struct_declaration().struct_declarator_list());
         String finalPropertyText = EMPTY_STRING;
 
+        String translatedIdentifier = translateIdentifier(type);
         if(variable.contains(ASTERISK)) {
-            finalPropertyText += CC_SYNTHESIZE + translateIdentifier(type) + ASTERISK;
+            finalPropertyText += CC_SYNTHESIZE + translatedIdentifier + ASTERISK;
+        } else if (type.startsWith(Constants.ID)) {
+            finalPropertyText += CC_SYNTHESIZE + translatedIdentifier;
         } else {
-            finalPropertyText += CC_SYNTHESIZE_PASS_BY_REF + translateIdentifier(type);
+            finalPropertyText += CC_SYNTHESIZE_PASS_BY_REF + translatedIdentifier;
         }
 
         String transformedVariable = variable.replace('*', ' ').trim();
@@ -449,6 +459,21 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalPropertyText, true);
 
         return super.visitProperty_declaration(ctx);
+    }
+
+    @Override
+    public Void visitProperty_implementation(ObjCParser.Property_implementationContext ctx) {
+
+        String sourcePropertyImplementation = tokens.getText(ctx);
+
+        int start = outputBuffer.indexOf(sourcePropertyImplementation);
+        if(start < 0) {
+            return super.visitProperty_implementation(ctx);
+        }
+
+        writeToOutputBuffer(start, start + sourcePropertyImplementation.length(), sourcePropertyImplementation, "", true);
+
+        return super.visitProperty_implementation(ctx);
     }
 
     @Override
@@ -547,19 +572,63 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitAssignment_expression(ObjCParser.Assignment_expressionContext ctx) {
+        String sourceText = tokens.getText(ctx);
+
+        int start = outputBuffer.indexOf(sourceText);
+        return super.visitAssignment_expression(ctx);
+
+//        if(start < 0
+//                || ctx.assignment_operator() == null
+//                || ctx.unary_expression() == null
+//                || ctx.unary_expression().postfix_expression() == null
+//                ) return super.visitAssignment_expression(ctx);
+//
+//        String postFixSetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), true);
+//        if(!postFixSetterExpression.contains("("))
+//            return super.visitAssignment_expression(ctx);
+//
+//        String postFixGetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), false);
+//        String assignmentRHS = tokens.getText(ctx.assignment_expression());
+//
+//        int end = outputBuffer.indexOf(assignmentRHS, start);
+//
+//        String assignmentOperator = tokens.getText(ctx.assignment_operator());
+//        assignmentOperator = assignmentOperator.replace("=", "");
+//
+//        String finalExpression = "(" + postFixSetterExpression;
+//        if(assignmentOperator.trim().equals("")) {
+//            finalExpression += assignmentRHS + "))";
+//        } else {
+//            finalExpression += postFixGetterExpression + " " + assignmentOperator + " " + assignmentRHS + "))";
+//        }
+//
+//        writeToOutputBuffer(start, end + assignmentRHS.length(), sourceText, finalExpression, true);
+//        return super.visitAssignment_expression(ctx);
+    }
+
+    @Override
     public Void visitPostfix_expression(ObjCParser.Postfix_expressionContext ctx) {
         String sourceText = tokens.getText(ctx);
 
         int start = outputBuffer.indexOf(sourceText);
 
-        if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0)) return super.visitPostfix_expression(ctx);
+        if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0))
+            return super.visitPostfix_expression(ctx);
+
+        String finalExpression = visitPostFixExpression(ctx, false);
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression, true);
+        return super.visitPostfix_expression(ctx);
+    }
+
+    public String visitPostFixExpression(ObjCParser.Postfix_expressionContext ctx, boolean isSetter) {
 
         String finalExpression = EMPTY_STRING;
         for (int i=0; i<ctx.children.size(); i++) {
             String nodeText = tokens.getText(ctx.children.get(i).getSourceInterval());
             if(ctx.children.get(i) instanceof ObjCParser.IdentifierContext) {
-                finalExpression += "get" + toUpperFirstLetter(nodeText) + "()";
-                finalExpression = "(" + finalExpression + ")";
+                finalExpression += ((isSetter && i == ctx.children.size() - 1) ? "set" : "get") + toUpperFirstLetter(nodeText) + ((isSetter && i == ctx.children.size() - 1) ? "(" : "()");
+                finalExpression = ((isSetter && i == ctx.children.size() - 1) ? "" : "(") + finalExpression + (isSetter ? "" : ")");
             } else {
                 if(nodeText.equals(".")) {
                     nodeText = INSTANCE_INVOCATION_OPERATOR;
@@ -567,8 +636,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 finalExpression += nodeText;
             }
         }
-        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression, true);
-        return super.visitPostfix_expression(ctx);
+        return finalExpression;
     }
 
     @Override
@@ -703,11 +771,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int startMethodType = outputBuffer.indexOf(methodTypeString, startMethodBody);
         int endMethodType = startMethodType + methodTypeString.length();
 
-        methodTypeString = methodPrefix + translateIdentifier(methodTypeString.replaceAll("\\(", EMPTY_STRING).replaceAll("\\)", " "));
+        String methodTypeSanitized = methodTypeString.replaceAll("\\(", EMPTY_STRING).replaceAll("\\)", " ");
+        String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
+        methodTypeString = methodPrefix + translateIdentifier(finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix.startsWith(INIT)? Types.BOOL + " " : methodTypeSanitized);
         writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString, false);
 
         String classNamePrefix = shouldAddClassname? className + "::" : EMPTY_STRING;
-        String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
         String finalMethodNameParameterTypeAndNames = classNamePrefix + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
         String finalMethodTypeNameParameterTypeAndNames = methodTypeString + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
 
@@ -760,8 +829,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             }
         }
 
-        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER, superClassName + STATIC_INVOCATION_OPERATOR);
-        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
+        KEYWORDS_VS_TRANSLATIONS.remove(Keywords.SUPER);
         KEYWORDS_VS_TRANSLATIONS.put(Types.INSTANCETYPE, className + " " + ASTERISK);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
         for (final String key : Collections.list(KEYWORDS_VS_TRANSLATIONS.keys())) {
@@ -822,7 +890,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private String translatePrivateMethodsDeclaration() {
-        String finalPrivateMethodsDeclaration = "private: \n";
+        String finalPrivateMethodsDeclaration = "public: \n";
         for (final String methodDeclaration : methodSignatures) {
             finalPrivateMethodsDeclaration += "\n" + methodDeclaration + ";";
         }

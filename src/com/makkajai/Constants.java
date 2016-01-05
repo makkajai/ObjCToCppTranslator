@@ -14,6 +14,7 @@ public class Constants {
     public static final String M = ".m";
     public static final String CPP = ".cpp";
     public static final String USING_NS_CC = "USING_NS_CC;\n";
+    public static final String ID = "id";
     public static final String BEGINS_WITH_ID = "id\\W*<([A-Za-z]+)>\\W*";
     public static final String BEGINS_WITH_2_UPPER_CASE_LETTERS = "([A-Z]{2})(.*)";
     public static final String BEGINS_WITH_UPPER_CASE_LETTERS = "(\\_\\_)?([A-Z]{1})(.*)";
@@ -31,6 +32,10 @@ public class Constants {
     public static final String EMPTY_STRING = "";
     public static final String FILE_NAME_WITH_H_OR_M = "(.*\\.h)|(.*\\.m)";
     public static final String H_OR_M = "(.h)|(.m)";
+    public static final String INIT = "init";
+    public static final String SZ_WIN = "szWin.";
+    public static final String Y = ".y";
+    public static final String X = ".x";
 
     public static class Keywords {
         public static final String SUPER = "super";
@@ -63,7 +68,7 @@ public class Constants {
         public static final String CLASS = "class";
 
         public static final String SEQUENCE_ACTIONS = "Sequence::actions";
-        public static final String SEQUENCE_CREATEWITHVARIABLELIST = "Sequence::createWithVariableList";
+        public static final String SEQUENCE_CREATEWITHVARIABLELIST = "Sequence::create";
 
         public static final String ACTIONFINITETIME = "ActionFiniteTime";
         public static final String FINITETIMEACTION = "FiniteTimeAction";
@@ -77,7 +82,7 @@ public class Constants {
         public static final String ACTIONSCALETO_CREATESCALE = "ActionScaleTo::createScale";
         public static final String SCALETO_CREATE = "ScaleTo::create";
 
-        public static final String ACTIONFADETO_CREATEOPACITY = "ActionFadeTo::createOpacity";
+        public static final String ACTIONFADETO_CREATEOPACITY = "cocos2d::ActionFadeTo::createOpacity";
         public static final String MAKKAJAIFADETO_CREATE = "MakkajaiFadeTo::create";
 
         public static final String ISEQUALTOSTRING = "isEqualToString";
@@ -100,6 +105,24 @@ public class Constants {
 
         public static final String ACTIONEASEBOUNCEOUT_ACTIONWITHACTION = "ActionEaseBounceOut::actionWithAction";
         public static final String EASEBOUNCEOUT_CREATE = "EaseBounceOut::create";
+
+        public static final String SZWIN_GETWIDTH = "szWin->getWidth\\(\\)";
+        public static final String SZWIN_WIDTH = "szWin.width";
+
+        public static final String SZWIN_GETHEIGHT = "szWin->getHeight\\(\\)";
+        public static final String SZWIN_HEIGHT = "szWin.height";
+
+        public static final String GETSZWIN_GETWIDTH = "getSzWin\\(\\)\\)->getWidth\\(\\)";
+        public static final String GETSZWIN_WIDTH = "getSzWin()).width";
+
+        public static final String GETSZWIN_GETHEIGHT = "getSzWin\\(\\)\\)->getHeight\\(\\)";
+        public static final String GETSZWIN_HEIGHT = "getSzWin()).height";
+
+        public static final String GETCONTENTSIZE_GETWIDTH = "getContentSize\\(\\)\\)->getWidth\\(\\)";
+        public static final String GETCONTENTSIZE_WIDTH = "getContentSize()).width";
+
+        public static final String GETCONTENTSIZE_GETHEIGHT = "getContentSize\\(\\)\\)->getHeight\\(\\)";
+        public static final String GETCONTENTSIZE_HEIGHT = "getContentSize()).height";
     }
 
     public static class Types {
@@ -113,7 +136,7 @@ public class Constants {
         public static final String REF_POINTER = REF + " *";
 
         public static final String NS_STRING = "NSString";
-        public static final String STRING = "std::string";
+        public static final String STRING = "const std::string";
 
         public static final String CCNodeColor = "CCNodeColor";
         public static final String NODE = COCOS2D + "Node";
@@ -192,5 +215,6 @@ public class Constants {
         public static final String SCHEDULEINTERVAL = "scheduleInterval";
         public static final String SCHEDULE = "schedule";
 
+        public static final String ALLOC = "alloc";
     }
 }
