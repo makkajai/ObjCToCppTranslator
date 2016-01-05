@@ -578,35 +578,33 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String sourceText = tokens.getText(ctx);
 
         int start = outputBuffer.indexOf(sourceText);
-        return super.visitAssignment_expression(ctx);
 
-//        if(start < 0
-//                || ctx.assignment_operator() == null
-//                || ctx.unary_expression() == null
-//                || ctx.unary_expression().postfix_expression() == null
-//                ) return super.visitAssignment_expression(ctx);
-//
-//        String postFixSetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), true);
-//        if(!postFixSetterExpression.contains("("))
-//            return super.visitAssignment_expression(ctx);
-//
-//        String postFixGetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), false);
-//        String assignmentRHS = tokens.getText(ctx.assignment_expression());
-//
-//        int end = outputBuffer.indexOf(assignmentRHS, start);
-//
-//        String assignmentOperator = tokens.getText(ctx.assignment_operator());
-//        assignmentOperator = assignmentOperator.replace("=", "");
-//
-//        String finalExpression = "(" + postFixSetterExpression;
-//        if(assignmentOperator.trim().equals("")) {
-//            finalExpression += assignmentRHS + "))";
-//        } else {
-//            finalExpression += postFixGetterExpression + " " + assignmentOperator + " " + assignmentRHS + "))";
-//        }
-//
-//        writeToOutputBuffer(start, end + assignmentRHS.length(), sourceText, finalExpression, true);
-//        return super.visitAssignment_expression(ctx);
+        if(start < 0
+                || ctx.assignment_operator() == null
+                || ctx.unary_expression() == null
+                || ctx.unary_expression().postfix_expression() == null
+                ) return super.visitAssignment_expression(ctx);
+
+        String postFixSetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), true);
+        if(!postFixSetterExpression.contains("("))
+            return super.visitAssignment_expression(ctx);
+
+        String postFixGetterExpression = visitPostFixExpression(ctx.unary_expression().postfix_expression(), false);
+        String assignmentRHS = tokens.getText(ctx.assignment_expression());
+
+        String assignmentOperator = tokens.getText(ctx.assignment_operator());
+        assignmentOperator = assignmentOperator.replace("=", "");
+
+        //What we are eseentially doing here is just adding a placeholder so that it can be replaced during further processing by other callback methods.
+        String finalExpression = "(" + tokens.getText(ctx.unary_expression()) + SETTER_PLACEHOLDER;
+        if(assignmentOperator.trim().equals("")) {
+            finalExpression += assignmentRHS + "))";
+        } else {
+            finalExpression += postFixGetterExpression + " " + assignmentOperator + " " + assignmentRHS + "))";
+        }
+
+        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression, true);
+        return super.visitAssignment_expression(ctx);
     }
 
     @Override
@@ -618,8 +616,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0))
             return super.visitPostfix_expression(ctx);
 
-        String finalExpression = visitPostFixExpression(ctx, false);
-        writeToOutputBuffer(start, start + sourceText.length(), sourceText, finalExpression, true);
+        boolean isSetter = outputBuffer.substring(start, start + (sourceText + SETTER_PLACEHOLDER).length()).contains(SETTER_PLACEHOLDER);
+        String finalExpression = visitPostFixExpression(ctx, isSetter);
+        writeToOutputBuffer(start, start + (isSetter? (sourceText + SETTER_PLACEHOLDER).length() : sourceText.length()), sourceText, finalExpression, true);
         return super.visitPostfix_expression(ctx);
     }
 
@@ -630,7 +629,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             String nodeText = tokens.getText(ctx.children.get(i).getSourceInterval());
             if(ctx.children.get(i) instanceof ObjCParser.IdentifierContext) {
                 finalExpression += ((isSetter && i == ctx.children.size() - 1) ? "set" : "get") + toUpperFirstLetter(nodeText) + ((isSetter && i == ctx.children.size() - 1) ? "(" : "()");
-                finalExpression = ((isSetter && i == ctx.children.size() - 1) ? "" : "(") + finalExpression + (isSetter ? "" : ")");
+                finalExpression = (isSetter ? "" : "(") + finalExpression + (isSetter ? "" : ")");
             } else {
                 if(nodeText.equals(".")) {
                     nodeText = INSTANCE_INVOCATION_OPERATOR;

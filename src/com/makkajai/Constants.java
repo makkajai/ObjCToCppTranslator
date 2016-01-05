@@ -31,11 +31,12 @@ public class Constants {
     public static final String CC_CALLBACK = "CC_CALLBACK_";
     public static final String EMPTY_STRING = "";
     public static final String FILE_NAME_WITH_H_OR_M = "(.*\\.h)|(.*\\.m)";
-    public static final String H_OR_M = "(.h)|(.m)";
+    public static final String H_OR_M = "(\\.h)|(\\.m)";
     public static final String INIT = "init";
     public static final String SZ_WIN = "szWin.";
     public static final String Y = ".y";
     public static final String X = ".x";
+    public static final String SETTER_PLACEHOLDER = "SETTER_PLACEHOLDER(";
 
     public static class Keywords {
         public static final String SUPER = "super";

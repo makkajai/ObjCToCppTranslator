@@ -67,21 +67,21 @@ public class ObjCToCpp {
                     translateFileInput.dryRun = true;
                     visitor.translateFile(translateFileInput);
                     Date stopTime = new Date();
-                    System.out.println("Dry run File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime, stopTime));
+                    System.out.println("Dry run File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime, stopTime));
 
                     Date startTime1 = new Date();
                     translateFileInput.filePathRelativeToInput = filePathRelativeToInput.replace(H, M);
                     translateFileInput.dryRun = false;
                     visitor.translateFile(translateFileInput);
                     stopTime = new Date();
-                    System.out.println("Processed File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime1, stopTime));
+                    System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime1, stopTime));
 
                     Date startTime2 = new Date();
                     translateFileInput.filePathRelativeToInput = filePathRelativeToInput;
                     translateFileInput.dryRun = false;
                     visitor.translateFile(translateFileInput);
                     stopTime = new Date();
-                    System.out.println("Processed File: " + filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
+                    System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
                     i+=2;
                     continue;
                 }
