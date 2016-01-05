@@ -103,6 +103,9 @@ public class Constants {
         public static final String SPRITE_SPRITEWITHIMAGENAMED = "Sprite::spriteWithImageNamed";
         public static final String SPRITE_CREATEWITHSPRITEFRAMENAME = "Sprite::createWithSpriteFrameName";
 
+        public static final String SPRITE_SPRITEWITHFILE = "Sprite::spriteWithFile";
+        public static final String SPRITE_CREATE = "Sprite::create";
+
         public static final String ACTIONEASEBOUNCEOUT_ACTIONWITHACTION = "ActionEaseBounceOut::actionWithAction";
         public static final String EASEBOUNCEOUT_CREATE = "EaseBounceOut::create";
 
@@ -123,6 +126,9 @@ public class Constants {
 
         public static final String GETCONTENTSIZE_GETHEIGHT = "getContentSize\\(\\)\\)->getHeight\\(\\)";
         public static final String GETCONTENTSIZE_HEIGHT = "getContentSize()).height";
+
+        public static final String CONST_STD_STRING_POINTER = "const std::string\\W*\\*";
+        public static final String CONST_STD_STRING = "const std::string ";
     }
 
     public static class Types {
