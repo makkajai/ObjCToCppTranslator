@@ -51,6 +51,20 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.PERCENTAGE_QUOTE, Keywords.PERCENTAGE_S);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_CLASS, Keywords.CLASS);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.AT_PROTOCOL, Keywords.CLASS);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SEQUENCE_ACTIONS, Keywords.SEQUENCE_CREATEWITHVARIABLELIST);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONFINITETIME, Keywords.FINITETIMEACTION);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONMOVETO_CREATEPOSITION, Keywords.MOVETO_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONREPEATFOREVER_ACTIONWITHACTION, Keywords.REPEATFOREVER_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONSCALETO_CREATESCALE, Keywords.SCALETO_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONFADETO_CREATEOPACITY, Keywords.MAKKAJAIFADETO_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ISEQUALTOSTRING, Keywords.ISEQUAL);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.UP_FLOAT, Keywords.FLOAT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONSPAWN_ACTIONS, Keywords.SPAWN_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONROTATEBY_CREATEANGLE, Keywords.ROTATEBY_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ROTATEBY_CREATE, Keywords.SCALEBY_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.SPRITE_SPRITEWITHIMAGENAMED, Keywords.SPRITE_CREATEWITHSPRITEFRAMENAME);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ACTIONEASEBOUNCEOUT_ACTIONWITHACTION, Keywords.EASEBOUNCEOUT_CREATE);
+
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_SIZE_MAKE, Methods.SIZE);
@@ -84,6 +98,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.ACTIONWITHBLOCK, Methods.CREATE);
         METHODS_VS_TRANSLATIONS.put(Methods.ACTIONWITHDURATION, Methods.CREATE);
         METHODS_VS_TRANSLATIONS.put(Methods.ACTIONONETWO, Methods.CREATEWITHTWOACTIONS);
+        METHODS_VS_TRANSLATIONS.put(Methods.NODE, Methods.CREATE);
+        METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDZ, Methods.ADDCHILD);
+        METHODS_VS_TRANSLATIONS.put(Methods.SCHEDULEINTERVAL, Methods.SCHEDULE);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
@@ -255,7 +272,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
-        String suffix = (indexOfBrace >= 0)? EMPTY_STRING : "{";
+        String suffix = ((indexOfBrace >= 0)? EMPTY_STRING : "{\n\npublic:\n\n");
 
         className = translateIdentifier(className);
         superClassName = translateIdentifier(superClassName);
@@ -524,7 +541,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         writeToOutputBuffer(start, start + sourceText.length(), sourceText, macroToUse
-                + className + STATIC_INVOCATION_OPERATOR + finalMethodName + ", this)", true);
+                + className + STATIC_INVOCATION_OPERATOR + translateMethodName(finalMethodName) + ", this)", true);
 
         return super.visitSelector_expression(ctx);
     }
@@ -675,7 +692,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             finalParameters += sourceParameter;
         }
 
-        return finalMethodName + "(" + finalParameters + ")";
+        return translateMethodName(finalMethodName) + "(" + finalParameters + ")";
     }
 
     private void translateMethodDefination(ObjCParser.Method_typeContext method_typeContext, ObjCParser.Method_selectorContext method_selectorContext,

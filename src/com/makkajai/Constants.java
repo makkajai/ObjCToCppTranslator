@@ -61,6 +61,45 @@ public class Constants {
         public static final String AT_PROTOCOL = "@protocol";
 
         public static final String CLASS = "class";
+
+        public static final String SEQUENCE_ACTIONS = "Sequence::actions";
+        public static final String SEQUENCE_CREATEWITHVARIABLELIST = "Sequence::createWithVariableList";
+
+        public static final String ACTIONFINITETIME = "ActionFiniteTime";
+        public static final String FINITETIMEACTION = "FiniteTimeAction";
+
+        public static final String ACTIONMOVETO_CREATEPOSITION = "ActionMoveTo::createPosition";
+        public static final String MOVETO_CREATE = "MoveTo::create";
+
+        public static final String ACTIONREPEATFOREVER_ACTIONWITHACTION = "ActionRepeatForever::actionWithAction";
+        public static final String REPEATFOREVER_CREATE = "RepeatForever::create";
+
+        public static final String ACTIONSCALETO_CREATESCALE = "ActionScaleTo::createScale";
+        public static final String SCALETO_CREATE = "ScaleTo::create";
+
+        public static final String ACTIONFADETO_CREATEOPACITY = "ActionFadeTo::createOpacity";
+        public static final String MAKKAJAIFADETO_CREATE = "MakkajaiFadeTo::create";
+
+        public static final String ISEQUALTOSTRING = "isEqualToString";
+        public static final String ISEQUAL = "isEqual";
+
+        public static final String UP_FLOAT = "Float";
+        public static final String FLOAT = "float";
+
+        public static final String ACTIONSPAWN_ACTIONS = "ActionSpawn::actions";
+        public static final String SPAWN_CREATE = "Spawn::create";
+
+        public static final String ACTIONROTATEBY_CREATEANGLE = "ActionRotateBy::createAngle";
+        public static final String ROTATEBY_CREATE = "RotateBy::create";
+
+        public static final String ACTIONSCALEBY_CREATESCALE = "ActionScaleBy::createScale";
+        public static final String SCALEBY_CREATE = "ScaleBy::create";
+
+        public static final String SPRITE_SPRITEWITHIMAGENAMED = "Sprite::spriteWithImageNamed";
+        public static final String SPRITE_CREATEWITHSPRITEFRAMENAME = "Sprite::createWithSpriteFrameName";
+
+        public static final String ACTIONEASEBOUNCEOUT_ACTIONWITHACTION = "ActionEaseBounceOut::actionWithAction";
+        public static final String EASEBOUNCEOUT_CREATE = "EaseBounceOut::create";
     }
 
     public static class Types {
@@ -74,7 +113,7 @@ public class Constants {
         public static final String REF_POINTER = REF + " *";
 
         public static final String NS_STRING = "NSString";
-        public static final String STRING = COCOS2D + "__String";
+        public static final String STRING = "std::string";
 
         public static final String CCNodeColor = "CCNodeColor";
         public static final String NODE = COCOS2D + "Node";
@@ -99,7 +138,7 @@ public class Constants {
         public static final String FLOAT = "float";
 
         public static final String NSDICTIONARY = "NSDictionary";
-        public static final String DICTIONARY = "__Dictionary";
+        public static final String DICTIONARY = COCOS2D + "__Dictionary";
 
         public static final String CCTOUCHEVENT = "CCTouchEvent";
         public static final String EVENT = COCOS2D + "Event";
@@ -144,6 +183,14 @@ public class Constants {
 
         public static final String ACTIONONETWO = "actionOneTwo";
         public static final String CREATEWITHTWOACTIONS = "createWithTwoActions";
+
+        public static final String NODE = "node";
+
+        public static final String ADDCHILDZ = "addChildZ";
+        public static final String ADDCHILD = "addChild";
+
+        public static final String SCHEDULEINTERVAL = "scheduleInterval";
+        public static final String SCHEDULE = "schedule";
 
     }
 }
