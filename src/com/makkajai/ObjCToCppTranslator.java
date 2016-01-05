@@ -616,7 +616,9 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(start < 0 || !(ctx.identifier() != null && ctx.identifier().size() > 0))
             return super.visitPostfix_expression(ctx);
 
-        boolean isSetter = outputBuffer.substring(start, start + (sourceText + SETTER_PLACEHOLDER).length()).contains(SETTER_PLACEHOLDER);
+        int endIndex = start + (sourceText + SETTER_PLACEHOLDER).length();
+        endIndex = outputBuffer.length() <= endIndex? outputBuffer.length() - 1 : endIndex;
+        boolean isSetter = outputBuffer.substring(start, endIndex).contains(SETTER_PLACEHOLDER);
         String finalExpression = visitPostFixExpression(ctx, isSetter);
         writeToOutputBuffer(start, start + (isSetter? (sourceText + SETTER_PLACEHOLDER).length() : sourceText.length()), sourceText, finalExpression, true);
         return super.visitPostfix_expression(ctx);
