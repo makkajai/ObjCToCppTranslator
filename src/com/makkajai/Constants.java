@@ -130,6 +130,12 @@ public class Constants {
 
         public static final String CONST_STD_STRING_POINTER = "const std::string\\W*\\*";
         public static final String CONST_STD_STRING = "const std::string ";
+
+        public static final String CGPOINTZERO = "CGPointZero";
+        public static final String VEC2_ZERO = "Vec2(0,0)";
+
+        public static final String BUTTON = COCOS2D + "Button";
+        public static final String UI_BUTTON = COCOS2D + "ui::Button";
     }
 
     public static class Types {
