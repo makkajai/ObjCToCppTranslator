@@ -156,7 +156,7 @@ public class Constants {
 
         public static final String NS_MUTABLE_ARRAY = "NSMutableArray";
         public static final String NS_ARRAY = "NSArray";
-        public static final String ARRAY = COCOS2D + "__Array";
+        public static final String ARRAY = COCOS2D + "Vector";
 
         public static final String CGPOINT = "CGPoint";
         public static final String VEC2 = COCOS2D + "Vec2";
@@ -174,7 +174,7 @@ public class Constants {
         public static final String FLOAT = "float";
 
         public static final String NSDICTIONARY = "NSDictionary";
-        public static final String DICTIONARY = COCOS2D + "__Dictionary";
+        public static final String DICTIONARY = COCOS2D + "Map";
 
         public static final String CCTOUCHEVENT = "CCTouchEvent";
         public static final String EVENT = COCOS2D + "Event";
