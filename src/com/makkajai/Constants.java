@@ -83,8 +83,16 @@ public class Constants {
         public static final String ACTIONSCALETO_CREATESCALE = "ActionScaleTo::createScale";
         public static final String SCALETO_CREATE = "ScaleTo::create";
 
-        public static final String ACTIONFADETO_CREATEOPACITY = "cocos2d::ActionFadeTo::createOpacity";
+        public static final String ACTIONFADETO_CREATEOPACITY = COCOS2D + "ActionFadeTo::createOpacity";
         public static final String MAKKAJAIFADETO_CREATE = "MakkajaiFadeTo::create";
+
+        public static final String ACTIONFADEIN_CREATEOPACITY = COCOS2D + "ActionFadeIn::create";
+        public static final String MAKKAJAIFADEIN_CREATE = COCOS2D + "FadeIn::create";
+
+        public static final String ACTIONFADEOUT_CREATEOPACITY = COCOS2D + "ActionFadeOut::create";
+        public static final String MAKKAJAIFADEOUT_CREATE = COCOS2D + "FadeOut::create";
+
+        public static final String ACTION = COCOS2D + "Action";
 
         public static final String ISEQUALTOSTRING = "isEqualToString";
         public static final String ISEQUAL = "isEqual";
