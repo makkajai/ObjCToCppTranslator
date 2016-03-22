@@ -30,6 +30,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private static final List<String> methodSignatures;
     private static String className;
     private static String superClassName;
+    private static String categoryClassName;
 
     private String fileName;
     private CommonTokenStream tokens;
@@ -119,7 +120,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         methodSignatures = new ArrayList<String>();
     }
 
-    public void translateFile(final TranslateFileInput translateFileInput) throws IOException {
+    void translateFile(final TranslateFileInput translateFileInput) throws IOException {
         initializeVariables(translateFileInput);
         startParsing(translateFileInput);
         writeOutput(translateFileInput);
@@ -253,6 +254,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         isProtocol = true;
         className = ctx.protocol_name().IDENTIFIER().getText();
         superClassName = null;
+        categoryClassName = null;
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
@@ -274,7 +276,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     public Void visitClass_interface(ObjCParser.Class_interfaceContext ctx) {
         String classInterfaceText = tokens.getText(ctx.getSourceInterval());
         int startIndex = outputBuffer.indexOf(classInterfaceText);
-        int startEndIndexIndex = outputBuffer.lastIndexOf(Keywords.END);
+        int startEndIndexIndex = outputBuffer.indexOf(Keywords.END);
 
         if(startIndex < 0)
             return super.visitClass_interface(ctx);
@@ -282,6 +284,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         isProtocol = false;
         className = ctx.class_name().IDENTIFIER().getText();
         superClassName = ctx.superclass_name().IDENTIFIER().getText();
+        categoryClassName = null;
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
@@ -301,11 +304,42 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitCategory_interface(ObjCParser.Category_interfaceContext ctx) {
+        String classInterfaceText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classInterfaceText);
+        int startEndIndexIndex = outputBuffer.indexOf(Keywords.END);
+
+        if(startIndex < 0)
+            return super.visitCategory_interface(ctx);
+
+        isProtocol = false;
+        className = ctx.class_name().IDENTIFIER().getText();
+        superClassName = null;
+        categoryClassName = ctx.category_name().IDENTIFIER().getText();
+        int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
+        int indexOfBrace = outputBuffer.indexOf("{", startIndex);
+        int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
+        String suffix = ((indexOfBrace >= 0)? EMPTY_STRING : "{\n\npublic:\n\n");
+
+        className = translateIdentifier(className);
+        categoryClassName = translateIdentifier(categoryClassName);
+
+        outputBuffer
+                .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(),
+                        String.format("\nCREATE_FUNC(%s);\n\n%s\n\n};\n\n#endif // __%s_H__", className, translatePrivateMethodsDeclaration(),
+                                className.toUpperCase())
+                )
+                .replace(startIndex, finalIndexToConsider, translateClassDeclaration(ctx.protocol_reference_list()) + suffix);
+
+        return super.visitCategory_interface(ctx);
+    }
+
+    @Override
     public Void visitClass_implementation(ObjCParser.Class_implementationContext ctx) {
 
         String classImplementationText = tokens.getText(ctx.getSourceInterval());
         int startIndex = outputBuffer.indexOf(classImplementationText);
-        int startEndIndexIndex = outputBuffer.lastIndexOf(Keywords.END);
+        int startEndIndexIndex = outputBuffer.indexOf(Keywords.END);
 
         if(startIndex < 0)
             return super.visitClass_implementation(ctx);
@@ -314,6 +348,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String originalClassName = ctx.class_name().getText();
         className = translateIdentifier(originalClassName);
         superClassName = ctx.superclass_name() != null ? ctx.superclass_name().getText() : superClassName;
+        categoryClassName = null;
         int startClassNameIndex = outputBuffer.indexOf(originalClassName, startIndex);
 
         int endClassNameIndex = startClassNameIndex + originalClassName.length();
@@ -326,6 +361,34 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         superClassName = translateIdentifier(superClassName);
 
         return super.visitClass_implementation(ctx);
+    }
+
+    @Override
+    public Void visitCategory_implementation(ObjCParser.Category_implementationContext ctx) {
+        String classImplementationText = tokens.getText(ctx.getSourceInterval());
+        int startIndex = outputBuffer.indexOf(classImplementationText);
+        int startEndIndexIndex = outputBuffer.indexOf(Keywords.END);
+
+        if(startIndex < 0)
+            return super.visitCategory_implementation(ctx);
+
+        isProtocol = false;
+        String originalClassName = ctx.class_name().getText();
+        className = translateIdentifier(originalClassName);
+        superClassName = null;
+        categoryClassName = ctx.category_name().IDENTIFIER().getText();
+        int startCategoryNameIndex = outputBuffer.indexOf(categoryClassName, startIndex);
+
+        int endClassNameIndex = startCategoryNameIndex + categoryClassName.length() + 1;
+
+        outputBuffer
+                .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(), EMPTY_STRING)
+                .replace(startIndex, endClassNameIndex, USING_NS_CC);
+
+        categoryClassName = translateIdentifier(categoryClassName);
+        className = translateIdentifier(className) + "_" + categoryClassName;
+
+        return super.visitCategory_implementation(ctx);
     }
 
     @Override
@@ -867,6 +930,11 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     private String translateClassDeclaration(ObjCParser.Protocol_reference_listContext protocol_reference_listContext) {
         String classDeclaration = CLASS + translateIdentifier(className)
                 + " :" + translateSuperClassDeclaration(superClassName);
+
+        if(categoryClassName != null) {
+            classDeclaration = CLASS + translateIdentifier(className)
+                    + "_" + translateIdentifier(categoryClassName) + " : " + translateSuperClassDeclaration(className);
+        }
 
         if(protocol_reference_listContext != null) {
             String separator = superClassName != null? "," : EMPTY_STRING;

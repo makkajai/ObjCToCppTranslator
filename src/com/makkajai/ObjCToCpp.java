@@ -64,25 +64,31 @@ public class ObjCToCpp {
             try {
                 final TranslateFileInput translateFileInput = new TranslateFileInput(inputDirectory, outputDirectory, filePathRelativeToInput, false);
                 if(nextFileIsM(currentFile, files, i)) {
-                    translateFileInput.dryRun = true;
-                    visitor.translateFile(translateFileInput);
-                    Date stopTime = new Date();
-                    System.out.println("Dry run File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime, stopTime));
+                    try {
+                        translateFileInput.dryRun = true;
+                        visitor.translateFile(translateFileInput);
+                        Date stopTime = new Date();
+                        System.out.println("Dry run File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime, stopTime));
 
-                    Date startTime1 = new Date();
-                    translateFileInput.filePathRelativeToInput = filePathRelativeToInput.replace(H, M);
-                    translateFileInput.dryRun = false;
-                    visitor.translateFile(translateFileInput);
-                    stopTime = new Date();
-                    System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime1, stopTime));
+                        Date startTime1 = new Date();
+                        translateFileInput.filePathRelativeToInput = filePathRelativeToInput.replace(H, M);
+                        translateFileInput.dryRun = false;
+                        visitor.translateFile(translateFileInput);
+                        stopTime = new Date();
+                        System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime1, stopTime));
 
-                    Date startTime2 = new Date();
-                    translateFileInput.filePathRelativeToInput = filePathRelativeToInput;
-                    translateFileInput.dryRun = false;
-                    visitor.translateFile(translateFileInput);
-                    stopTime = new Date();
-                    System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
-                    i+=2;
+                        Date startTime2 = new Date();
+                        translateFileInput.filePathRelativeToInput = filePathRelativeToInput;
+                        translateFileInput.dryRun = false;
+                        visitor.translateFile(translateFileInput);
+                        stopTime = new Date();
+                        System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("###########################Continuing with the next set of files##########################");
+                    } finally {
+                        i+=2;
+                    }
                     continue;
                 }
                 visitor.translateFile(translateFileInput);
