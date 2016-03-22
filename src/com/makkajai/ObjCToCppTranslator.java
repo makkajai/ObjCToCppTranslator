@@ -79,6 +79,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.BUTTON, Keywords.UI_BUTTON);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ARRAY_WITH, Keywords.CREATE_WITH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DICTIONARY_WITH, Keywords.CREATE_WITH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.STRING_WITH, Keywords.CREATE_WITH);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -90,6 +91,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CCNodeColor, Types.NODE);
         TYPES_VS_TRANSLATIONS.put(Types.NS_ARRAY, Types.ARRAY);
         TYPES_VS_TRANSLATIONS.put(Types.NS_MUTABLE_ARRAY, Types.ARRAY);
+        TYPES_VS_TRANSLATIONS.put(Types.NS_SET, Types.SET);
+        TYPES_VS_TRANSLATIONS.put(Types.NS_MUTABLE_SET, Types.SET);
         TYPES_VS_TRANSLATIONS.put(Types.BOOL, Types.BOOL.toLowerCase());
         TYPES_VS_TRANSLATIONS.put(Types.ID, Types.REF_POINTER);
         TYPES_VS_TRANSLATIONS.put(Types.CGPOINT, Types.VEC2);

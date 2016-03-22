@@ -149,6 +149,7 @@ public class Constants {
         public static final String CREATE_WITH = "createWith";
 
         public static final String DICTIONARY_WITH = "dictionaryWith";
+        public static final String STRING_WITH = "stringWith";
     }
 
     public static class Types {
@@ -162,7 +163,7 @@ public class Constants {
         public static final String REF_POINTER = REF + " *";
 
         public static final String NS_STRING = "NSString";
-        public static final String STRING = "const std::string";
+        public static final String STRING = COCOS2D + "__String";
 
         public static final String CCNodeColor = "CCNodeColor";
         public static final String NODE = COCOS2D + "Node";
@@ -170,6 +171,10 @@ public class Constants {
         public static final String NS_MUTABLE_ARRAY = "NSMutableArray";
         public static final String NS_ARRAY = "NSArray";
         public static final String ARRAY = COCOS2D + "__Array";
+
+        public static final String NS_MUTABLE_SET = "NSMutableSet";
+        public static final String NS_SET = "NSSet";
+        public static final String SET = COCOS2D + "__Set";
 
         public static final String CGPOINT = "CGPoint";
         public static final String VEC2 = COCOS2D + "Vec2";
