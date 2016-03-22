@@ -77,6 +77,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.CONST_STD_STRING_POINTER, Keywords.CONST_STD_STRING);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.CGPOINTZERO, Keywords.VEC2_ZERO);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.BUTTON, Keywords.UI_BUTTON);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.ARRAY_WITH, Keywords.CREATE_WITH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DICTIONARY_WITH, Keywords.CREATE_WITH);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
