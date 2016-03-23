@@ -85,7 +85,7 @@ public class ObjCToCpp {
                         System.out.println("Processed File: " + translateFileInput.filePathRelativeToInput + " Time Taken: " + getDelta(startTime2, stopTime));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println("###########################Continuing with the next set of files##########################");
+                        System.out.println("###########################Error Processing: " + filePathRelativeToInput + ", Continuing with next set of tiles");
                     } finally {
                         i+=2;
                     }
@@ -95,7 +95,7 @@ public class ObjCToCpp {
                 i++;
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("###########################Continuing with the next set of files##########################");
+                System.out.println("###########################Error Processing: " + filePathRelativeToInput + ", Continuing with next set of tiles");
             } finally {
                 Date stopTime = new Date();
                 System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));

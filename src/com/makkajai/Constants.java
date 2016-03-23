@@ -265,5 +265,7 @@ public class Constants {
 
         public static final String ADDOBSERVER_SELECTOR_NAME_OBJECT = "addObserverSelectorNameObject";
         public static final String ADDOBSERVER = "addObserver";
+
+        public static final String ADDCHILDNAME = "addChildName";
     }
 }

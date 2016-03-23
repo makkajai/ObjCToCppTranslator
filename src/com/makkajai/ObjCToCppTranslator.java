@@ -126,6 +126,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.ALLOC, Methods.CREATE);
         METHODS_VS_TRANSLATIONS.put(Methods.LABELWITHSTRING_FONTNAME_FONTSIZE, Methods.CREATEWITHTTF);
         METHODS_VS_TRANSLATIONS.put(Methods.ADDOBSERVER_SELECTOR_NAME_OBJECT, Methods.ADDOBSERVER);
+        METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDNAME, Methods.ADDCHILD);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
@@ -326,7 +327,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         isProtocol = false;
         className = ctx.class_name().IDENTIFIER().getText();
         superClassName = null;
-        categoryClassName = ctx.category_name().IDENTIFIER().getText();
+        categoryClassName = ctx.category_name() != null? ctx.category_name().IDENTIFIER().getText() : null;
         int indexOfFirstNewLine = outputBuffer.indexOf("\n", startIndex);
         int indexOfBrace = outputBuffer.indexOf("{", startIndex);
         int finalIndexToConsider = (indexOfBrace >= 0)? indexOfBrace : indexOfFirstNewLine;
@@ -387,7 +388,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         String originalClassName = ctx.class_name().getText();
         className = translateIdentifier(originalClassName);
         superClassName = null;
-        categoryClassName = ctx.category_name().IDENTIFIER().getText();
+        categoryClassName = ctx.category_name() != null? ctx.category_name().IDENTIFIER().getText() : null;
         int startCategoryNameIndex = outputBuffer.indexOf(categoryClassName, startIndex);
 
         int endClassNameIndex = startCategoryNameIndex + categoryClassName.length() + 1;
@@ -397,7 +398,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 .replace(startIndex, endClassNameIndex, USING_NS_CC);
 
         categoryClassName = translateIdentifier(categoryClassName);
-        className = translateIdentifier(className) + "_" + categoryClassName;
+        className = translateIdentifier(className) + (categoryClassName != null?  "_" + categoryClassName : "");
 
         return super.visitCategory_implementation(ctx);
     }
