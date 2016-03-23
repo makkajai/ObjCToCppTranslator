@@ -189,6 +189,7 @@ public class Constants {
         public static final String RECT = COCOS2D + "Rect";
 
         public static final String NSUINTEGER = "NSUInteger";
+        public static final String NSINTEGER = "NSInteger";
         public static final String INT = "int";
 
         public static final String UP_FLOAT = "Float";
@@ -227,6 +228,9 @@ public class Constants {
 
         public static final String NSNUMBER = "NSNumber";
         public static final String __INTEGER = COCOS2D + "__Integer";
+
+        public static final String SEL = "SEL";
+        public static final String SEL_CALLFUNCO = COCOS2D + "SEL_CallFuncO";
     }
 
     public static class Methods {

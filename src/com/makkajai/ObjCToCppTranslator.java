@@ -100,6 +100,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CGSIZE, Types.SIZE);
         TYPES_VS_TRANSLATIONS.put(Types.CGRECT, Types.RECT);
         TYPES_VS_TRANSLATIONS.put(Types.NSUINTEGER, Types.INT);
+        TYPES_VS_TRANSLATIONS.put(Types.NSINTEGER, Types.INT);
         TYPES_VS_TRANSLATIONS.put(Types.UP_FLOAT, Types.FLOAT);
         TYPES_VS_TRANSLATIONS.put(Types.NSDICTIONARY, Types.DICTIONARY);
         TYPES_VS_TRANSLATIONS.put(Types.CCTOUCHEVENT, Types.EVENT);
@@ -112,6 +113,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CCLABELTTF, Types.LABEL);
         TYPES_VS_TRANSLATIONS.put(Types.NSNOTIFICATIONCENTER, Types.__NOTIFICATIONCENTER);
         TYPES_VS_TRANSLATIONS.put(Types.NSNUMBER, Types.__INTEGER);
+        TYPES_VS_TRANSLATIONS.put(Types.SEL, Types.SEL_CALLFUNCO);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
