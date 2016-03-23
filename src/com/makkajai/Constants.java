@@ -151,8 +151,17 @@ public class Constants {
         public static final String DICTIONARY_WITH = "dictionaryWith";
         public static final String STRING_WITH = "stringWith";
 
-        public static final String DDLOG = "DDLog";
-        public static final String CCLOG = "CCLog";
+        public static final String DDLOGVERBOSE = "DDLogVerbose";
+        public static final String CCLOGINFO = "CCLOGINFO";
+
+        public static final String DDLOGWARN = "DDLogWarn";
+        public static final String CCLOGWARN = "CCLOGWARN";
+
+        public static final String DDLOGERROR = "DDLogError";
+        public static final String CCLOGERROR = "CCLOGERROR";
+
+        public static final String TOBEDELETED_TEMP_STRING = "@TOBEDELETED_TEMP_STRING";
+        public static final String EMPTY = "";
     }
 
     public static class Types {
@@ -196,6 +205,7 @@ public class Constants {
         public static final String FLOAT = "float";
 
         public static final String NSDICTIONARY = "NSDictionary";
+        public static final String NSMUTABLEDICTIONARY = "NSMutableDictionary";
         public static final String DICTIONARY = COCOS2D + "__Dictionary";
 
         public static final String CCTOUCHEVENT = "CCTouchEvent";

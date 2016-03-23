@@ -80,7 +80,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ARRAY_WITH, Keywords.CREATE_WITH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DICTIONARY_WITH, Keywords.CREATE_WITH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.STRING_WITH, Keywords.CREATE_WITH);
-        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOG, Keywords.CCLOG);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOGVERBOSE, Keywords.CCLOGINFO);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOGWARN, Keywords.CCLOGWARN);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOGERROR, Keywords.CCLOGERROR);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.TOBEDELETED_TEMP_STRING, Keywords.EMPTY);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -103,6 +106,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.NSINTEGER, Types.INT);
         TYPES_VS_TRANSLATIONS.put(Types.UP_FLOAT, Types.FLOAT);
         TYPES_VS_TRANSLATIONS.put(Types.NSDICTIONARY, Types.DICTIONARY);
+        TYPES_VS_TRANSLATIONS.put(Types.NSMUTABLEDICTIONARY, Types.DICTIONARY);
         TYPES_VS_TRANSLATIONS.put(Types.CCTOUCHEVENT, Types.EVENT);
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNC, Types.CALLFUNC);
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONCALLFUNCO, Types.CALLFUNCO);
@@ -139,6 +143,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         startParsing(translateFileInput);
         writeOutput(translateFileInput);
     }
+
+
 
     private void initializeVariables(final TranslateFileInput translateFileInput) throws IOException {
         //The input file to parse!
@@ -281,7 +287,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 .replace(startEndIndexIndex, startEndIndexIndex + Keywords.END.length(),
                         String.format("\n\n};\n\n#endif // __%s_H__", className.toUpperCase())
                 )
-                .replace(startIndex, finalIndexToConsider, translateClassDeclaration(ctx.protocol_reference_list()) + suffix);
+                .replace(startIndex, finalIndexToConsider, translateClassDeclaration(ctx.protocol_reference_list()) + suffix + "\n\npublic:\n\n");
 
         return super.visitProtocol_declaration(ctx);
     }
@@ -458,7 +464,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
-                "virtual ", true);
+                "", true);
 
         isProcessingInstanceMethod = true;
 
@@ -478,7 +484,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
-                "static ", true);
+                "", true);
 
         isProcessingInstanceMethod = false;
 
@@ -596,6 +602,25 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
 
         return super.visitInstance_variables(ctx);
+    }
+
+    @Override
+    public Void visitPrimary_expression(ObjCParser.Primary_expressionContext ctx) {
+        if(ctx.STRING_LITERAL() != null) {
+            String sourceString = tokens.getText(ctx);
+
+            int start = outputBuffer.indexOf(sourceString);
+            if(start < 0) {
+                return super.visitPrimary_expression(ctx);
+            }
+
+            writeToOutputBuffer(start, start+sourceString.length(), sourceString, "cocos2d::__String::create("
+                    + sourceString.substring(0, 1)
+                    + "TOBEDELETED_TEMP_STRING"
+                    +  sourceString.substring(1) + ")", true);
+            return super.visitPrimary_expression(ctx);
+        }
+        return super.visitPrimary_expression(ctx);
     }
 
     @Override

@@ -4,8 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,14 +27,28 @@ public class ObjCToCpp {
      */
     public static void main(String[] args) throws IOException {
 
-        if(args.length != 2) {
+        if(args.length < 2) {
             System.out.println("Invalid Arguments!");
             System.out.println("Usage: java com.makkajai.ObjCToCpp \"<directory to scan for .h and .m files>\" \"<directory to write .h and .cpp files>\"");
             return;
         }
 
-        String inputDirectory = args[0];
-        String outputDirectory = args[1];
+//        String inputDirectory = args[0];
+//        String outputDirectory = args[1];
+        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/scenes";
+        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai/scenes/temp";
+
+        List<String> exceptFiles = new ArrayList<String>();
+
+        if(args.length == 3) {
+            BufferedReader bufferedInputStream = new BufferedReader(new FileReader(args[2]));
+            String exceptFile = null;
+            while((exceptFile = bufferedInputStream.readLine()) != null) {
+                if(exceptFile.equals("")) continue;
+                exceptFiles.add(exceptFile);
+            }
+        }
+
         //Getting all the files from the input directory.
         final List<File> files = new ArrayList<File>(FileUtils.listFiles(
                 new File(inputDirectory),
@@ -65,6 +78,7 @@ public class ObjCToCpp {
                 final TranslateFileInput translateFileInput = new TranslateFileInput(inputDirectory, outputDirectory, filePathRelativeToInput, false);
                 if(nextFileIsM(currentFile, files, i)) {
                     try {
+                        if(isIgnoredFile(filePathRelativeToInput, exceptFiles)) continue;
                         translateFileInput.dryRun = true;
                         visitor.translateFile(translateFileInput);
                         Date stopTime = new Date();
@@ -101,6 +115,14 @@ public class ObjCToCpp {
                 System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
             }
         }
+    }
+
+    private static boolean isIgnoredFile(String filePathRelativeToInput, List<String> exceptFiles) {
+        for (String exceptFile : exceptFiles) {
+            if(filePathRelativeToInput.contains(exceptFile))
+                return true;
+        }
+        return false;
     }
 
     private static double getDelta(Date startTime, Date stopTime) {
