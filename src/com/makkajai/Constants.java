@@ -221,6 +221,12 @@ public class Constants {
 
         public static final String CCLABELTTF = "CCLabelTTF";
         public static final String LABEL = COCOS2D + "Label";
+
+        public static final String NSNOTIFICATIONCENTER = "NSNotificationCenter";
+        public static final String __NOTIFICATIONCENTER = COCOS2D + "__NotificationCenter";
+
+        public static final String NSNUMBER = "NSNumber";
+        public static final String __INTEGER = COCOS2D + "__Integer";
     }
 
     public static class Methods {
@@ -256,5 +262,8 @@ public class Constants {
 
         public static final String LABELWITHSTRING_FONTNAME_FONTSIZE = "labelWithStringFontNameFontSize";
         public static final String CREATEWITHTTF = "createWithTTF";
+
+        public static final String ADDOBSERVER_SELECTOR_NAME_OBJECT = "addObserverSelectorNameObject";
+        public static final String ADDOBSERVER = "addObserver";
     }
 }

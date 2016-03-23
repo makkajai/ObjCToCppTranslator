@@ -110,6 +110,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONSEQUENCE, Types.SEQUENCE);
         TYPES_VS_TRANSLATIONS.put(Types.CCCOLOR, Types.MAKKAJAICOLOR);
         TYPES_VS_TRANSLATIONS.put(Types.CCLABELTTF, Types.LABEL);
+        TYPES_VS_TRANSLATIONS.put(Types.NSNOTIFICATIONCENTER, Types.__NOTIFICATIONCENTER);
+        TYPES_VS_TRANSLATIONS.put(Types.NSNUMBER, Types.__INTEGER);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
@@ -123,6 +125,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.SCHEDULEINTERVAL, Methods.SCHEDULE);
         METHODS_VS_TRANSLATIONS.put(Methods.ALLOC, Methods.CREATE);
         METHODS_VS_TRANSLATIONS.put(Methods.LABELWITHSTRING_FONTNAME_FONTSIZE, Methods.CREATEWITHTTF);
+        METHODS_VS_TRANSLATIONS.put(Methods.ADDOBSERVER_SELECTOR_NAME_OBJECT, Methods.ADDOBSERVER);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
