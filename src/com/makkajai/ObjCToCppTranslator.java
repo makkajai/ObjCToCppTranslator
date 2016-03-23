@@ -80,6 +80,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.ARRAY_WITH, Keywords.CREATE_WITH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DICTIONARY_WITH, Keywords.CREATE_WITH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.STRING_WITH, Keywords.CREATE_WITH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOG, Keywords.CCLOG);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -108,6 +109,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONDELAY, Types.DELAYTIME);
         TYPES_VS_TRANSLATIONS.put(Types.CCACTIONSEQUENCE, Types.SEQUENCE);
         TYPES_VS_TRANSLATIONS.put(Types.CCCOLOR, Types.MAKKAJAICOLOR);
+        TYPES_VS_TRANSLATIONS.put(Types.CCLABELTTF, Types.LABEL);
 
         METHODS_VS_TRANSLATIONS.put(Methods.STRING_WITH_FORMAT, Methods.CREATE_WITH_FORMAT);
         METHODS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
@@ -120,6 +122,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDZ, Methods.ADDCHILD);
         METHODS_VS_TRANSLATIONS.put(Methods.SCHEDULEINTERVAL, Methods.SCHEDULE);
         METHODS_VS_TRANSLATIONS.put(Methods.ALLOC, Methods.CREATE);
+        METHODS_VS_TRANSLATIONS.put(Methods.LABELWITHSTRING_FONTNAME_FONTSIZE, Methods.CREATEWITHTTF);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();

@@ -150,6 +150,9 @@ public class Constants {
 
         public static final String DICTIONARY_WITH = "dictionaryWith";
         public static final String STRING_WITH = "stringWith";
+
+        public static final String DDLOG = "DDLog";
+        public static final String CCLOG = "CCLog";
     }
 
     public static class Types {
@@ -215,6 +218,9 @@ public class Constants {
         public static final String MAKKAJAICOLOR = "MakkajaiColor";
 
         public static final String INSTANCETYPE = "instancetype";
+
+        public static final String CCLABELTTF = "CCLabelTTF";
+        public static final String LABEL = COCOS2D + "Label";
     }
 
     public static class Methods {
@@ -247,5 +253,8 @@ public class Constants {
         public static final String SCHEDULE = "schedule";
 
         public static final String ALLOC = "alloc";
+
+        public static final String LABELWITHSTRING_FONTNAME_FONTSIZE = "labelWithStringFontNameFontSize";
+        public static final String CREATEWITHTTF = "createWithTTF";
     }
 }
