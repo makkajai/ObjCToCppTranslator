@@ -19,6 +19,6 @@ CollectCandy.h
 AnimationData
 AnimationCallbackData
 /CandyCounter.h
-/ProgressBarCandyCounter.h
+SkeletonCharacter
 
 
