@@ -84,6 +84,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOGWARN, Keywords.CCLOGWARN);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DDLOGERROR, Keywords.CCLOGERROR);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.TOBEDELETED_TEMP_STRING, Keywords.EMPTY);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.__ARRAY_ARRAY, Keywords.__ARRAY_CREATE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.DIRECTOR_SHARED_DIRECTOR, Keywords.DIRECTOR_GETINSTANCE);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -195,6 +197,10 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int startIndex = outputBuffer.indexOf(importText);
 
         if(startIndex < 0)
+            return super.visitPreprocessor_declaration(ctx);
+
+        //Ignoring certain headers.
+        if(importText.contains("Foundation/Foundation.h"))
             return super.visitPreprocessor_declaration(ctx);
 
         int endIndex = startIndex + importText.length();

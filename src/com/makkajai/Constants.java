@@ -162,6 +162,12 @@ public class Constants {
 
         public static final String TOBEDELETED_TEMP_STRING = "@TOBEDELETED_TEMP_STRING";
         public static final String EMPTY = "";
+
+        public static final String __ARRAY_ARRAY = "__Array::array()";
+        public static final String __ARRAY_CREATE = "__Array::create()";
+
+        public static final String DIRECTOR_SHARED_DIRECTOR = "Director::sharedDirector()";
+        public static final String DIRECTOR_GETINSTANCE = "Director::getInstance()";
     }
 
     public static class Types {
