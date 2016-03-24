@@ -86,6 +86,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.TOBEDELETED_TEMP_STRING, Keywords.EMPTY);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.__ARRAY_ARRAY, Keywords.__ARRAY_CREATE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DIRECTOR_SHARED_DIRECTOR, Keywords.DIRECTOR_GETINSTANCE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.CCBUTTON, Keywords.UI_BUTTON);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -135,12 +136,20 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.LABELWITHSTRING_FONTNAME_FONTSIZE, Methods.CREATEWITHTTF);
         METHODS_VS_TRANSLATIONS.put(Methods.ADDOBSERVER_SELECTOR_NAME_OBJECT, Methods.ADDOBSERVER);
         METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDNAME, Methods.ADDCHILD);
+        METHODS_VS_TRANSLATIONS.put(Methods.ADDCHILDTAG, Methods.ADDCHILD);
+        METHODS_VS_TRANSLATIONS.put(Methods.REMOVECHILDCLEANUP, Methods.REMOVECHILD);
+        METHODS_VS_TRANSLATIONS.put(Methods.REMOVECHILDBYTAGCLEANUP, Methods.REMOVECHILDBYTAG);
+        METHODS_VS_TRANSLATIONS.put(Methods.VIEWSIZE, Methods.GETWINSIZE);
+        METHODS_VS_TRANSLATIONS.put(Methods.RUNNINGSCENE, Methods.GETRUNNINGSCENE);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
     }
 
     void translateFile(final TranslateFileInput translateFileInput) throws IOException {
+        if(translateFileInput.filePathRelativeToInput.contains("IconWithText")) {
+            System.out.println("Break!");
+        }
         initializeVariables(translateFileInput);
         startParsing(translateFileInput);
         writeOutput(translateFileInput);
@@ -199,10 +208,6 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(startIndex < 0)
             return super.visitPreprocessor_declaration(ctx);
 
-        //Ignoring certain headers.
-        if(importText.contains("Foundation/Foundation.h"))
-            return super.visitPreprocessor_declaration(ctx);
-
         int endIndex = startIndex + importText.length();
 
         String fileToImport = importText.replaceAll(Keywords.IMPORT, EMPTY_STRING);
@@ -225,7 +230,14 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             headerFileName += parts[i];
         }
         headerFileName += (isWithAngleBrackets? ">" : "\"") + "\n";
-        writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName, true);
+        //Ignoring certain headers.
+        if(importText.contains("Foundation/Foundation.h")
+                || importText.contains("ReflectionKit.h")
+                || importText.contains("CoreGraphics.h")
+                )
+            writeToOutputBuffer(startIndex, endIndex, importText, "", true);
+        else
+            writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName, true);
 
         return super.visitPreprocessor_declaration(ctx);
     }

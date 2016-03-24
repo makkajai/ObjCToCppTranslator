@@ -168,6 +168,8 @@ public class Constants {
 
         public static final String DIRECTOR_SHARED_DIRECTOR = "Director::sharedDirector()";
         public static final String DIRECTOR_GETINSTANCE = "Director::getInstance()";
+
+        public static final String CCBUTTON = "CCButton";
     }
 
     public static class Types {
@@ -287,5 +289,18 @@ public class Constants {
         public static final String ADDOBSERVER = "addObserver";
 
         public static final String ADDCHILDNAME = "addChildName";
+        public static final String ADDCHILDTAG= "addChildTag";
+
+        public static final String REMOVECHILDCLEANUP = "removeChildCleanup";
+        public static final String REMOVECHILD = "removeChild";
+
+        public static final String REMOVECHILDBYTAGCLEANUP = "removeChildByTagCleanup";
+        public static final String REMOVECHILDBYTAG = "removeChildByTag";
+
+        public static final String VIEWSIZE = "viewSize";
+        public static final String GETWINSIZE = "getWinSize";
+
+        public static final String RUNNINGSCENE = "runningScene";
+        public static final String GETRUNNINGSCENE = "getRunningScene";
     }
 }

@@ -35,8 +35,8 @@ public class ObjCToCpp {
 
 //        String inputDirectory = args[0];
 //        String outputDirectory = args[1];
-        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/scenes";
-        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai/scenes/temp";
+        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai";
+        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai";
 
         List<String> exceptFiles = new ArrayList<String>();
 
@@ -105,7 +105,8 @@ public class ObjCToCpp {
                     }
                     continue;
                 }
-                visitor.translateFile(translateFileInput);
+                if(!isIgnoredFile(filePathRelativeToInput, exceptFiles))
+                    visitor.translateFile(translateFileInput);
                 i++;
             } catch (Exception e) {
                 e.printStackTrace();
