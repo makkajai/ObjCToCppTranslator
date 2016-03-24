@@ -87,6 +87,13 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.__ARRAY_ARRAY, Keywords.__ARRAY_CREATE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.DIRECTOR_SHARED_DIRECTOR, Keywords.DIRECTOR_GETINSTANCE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.CCBUTTON, Keywords.UI_BUTTON);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.UBYTE, Keywords.GLUBYTE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.TIME, Keywords.FLOAT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETX, Keywords.X);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETY, Keywords.Y);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETWIDTH, Keywords.WIDTH);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETHEIGHT, Keywords.HEIGHT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.CGPOINTMAKE, Keywords.VEC2);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -141,6 +148,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.REMOVECHILDBYTAGCLEANUP, Methods.REMOVECHILDBYTAG);
         METHODS_VS_TRANSLATIONS.put(Methods.VIEWSIZE, Methods.GETWINSIZE);
         METHODS_VS_TRANSLATIONS.put(Methods.RUNNINGSCENE, Methods.GETRUNNINGSCENE);
+        METHODS_VS_TRANSLATIONS.put(Methods.COPY, Methods.CLONE);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
@@ -234,6 +242,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         if(importText.contains("Foundation/Foundation.h")
                 || importText.contains("ReflectionKit.h")
                 || importText.contains("CoreGraphics.h")
+                || importText.contains("OverlayEffects.h")
                 )
             writeToOutputBuffer(startIndex, endIndex, importText, "", true);
         else
@@ -482,7 +491,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
-                "", true);
+                "virtual ", true);
 
         isProcessingInstanceMethod = true;
 
@@ -502,7 +511,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         }
 
         translateMethodDefination(ctx.method_definition().method_type(), ctx.method_definition().method_selector(), tokens.getText(ctx), startMethodBody,
-                "", true);
+                "static ", true);
 
         isProcessingInstanceMethod = false;
 
@@ -900,12 +909,12 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
         String methodTypeSanitized = methodTypeString.replaceAll("\\(", EMPTY_STRING).replaceAll("\\)", " ");
         String finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix = translateMethodNameParameterTypeAndNames(method_selectorContext);
-        methodTypeString = methodPrefix + translateIdentifier(finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix.startsWith(INIT)? Types.BOOL + " " : methodTypeSanitized);
+        methodTypeString = (shouldAddClassname? "" : methodPrefix) + translateIdentifier(finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix.startsWith(INIT)? Types.BOOL + " " : methodTypeSanitized);
         writeToOutputBuffer(startMethodBody, endMethodType, sourceMethodTypeString, methodTypeString, false);
 
         String classNamePrefix = shouldAddClassname? className + "::" : EMPTY_STRING;
         String finalMethodNameParameterTypeAndNames = classNamePrefix + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
-        String finalMethodTypeNameParameterTypeAndNames = methodTypeString + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
+        String finalMethodTypeNameParameterTypeAndNames = (shouldAddClassname? methodPrefix : "") + methodTypeString + finalMethodNameParameterTypeAndNamesWithoutClassNamePrefix;
 
         String methodSelectorString = tokens.getText(method_selectorContext.getSourceInterval());
         int startMethodSelector = outputBuffer.indexOf(methodSelectorString, startMethodBody);

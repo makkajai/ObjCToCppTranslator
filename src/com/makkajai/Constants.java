@@ -170,6 +170,26 @@ public class Constants {
         public static final String DIRECTOR_GETINSTANCE = "Director::getInstance()";
 
         public static final String CCBUTTON = "CCButton";
+
+        public static final String UBYTE = "ubyte";
+        public static final String GLUBYTE = "GLubyte";
+
+        public static final String TIME = "cocos2d::Time";
+
+        public static final String GETX = "->getX()";
+        public static final String X = ".x";
+
+        public static final String GETY = "->getY()";
+        public static final String Y = ".y";
+
+        public static final String GETWIDTH = "->getWidth()";
+        public static final String WIDTH = ".width";
+
+        public static final String GETHEIGHT = "->getHeight()";
+        public static final String HEIGHT = ".height";
+
+        public static final String CGPOINTMAKE = "CGPointMake";
+        public static final String VEC2 = COCOS2D + "Vec2";
     }
 
     public static class Types {
@@ -302,5 +322,8 @@ public class Constants {
 
         public static final String RUNNINGSCENE = "runningScene";
         public static final String GETRUNNINGSCENE = "getRunningScene";
+
+        public static final String COPY = "copy";
+        public static final String CLONE = "clone";
     }
 }

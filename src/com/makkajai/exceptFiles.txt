@@ -8,3 +8,17 @@ MakkajaiConfiguration
 MakkajaiLayerBase
 MakkajaiFileUtil
 CD
+IconWithText
+PowerUp
+Shot
+/Speech.h
+/Character.h
+/Move.h
+LifeCycle.h
+CollectCandy.h
+AnimationData
+AnimationCallbackData
+/CandyCounter.h
+/ProgressBarCandyCounter.h
+
+
