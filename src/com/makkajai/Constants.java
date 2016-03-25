@@ -163,10 +163,10 @@ public class Constants {
         public static final String TOBEDELETED_TEMP_STRING = "@TOBEDELETED_TEMP_STRING";
         public static final String EMPTY = "";
 
-        public static final String __ARRAY_ARRAY = "__Array::array()";
+        public static final String __ARRAY_ARRAY = "__Array::array\\(\\)";
         public static final String __ARRAY_CREATE = "__Array::create()";
 
-        public static final String DIRECTOR_SHARED_DIRECTOR = "Director::sharedDirector()";
+        public static final String DIRECTOR_SHARED_DIRECTOR = "Director::sharedDirector\\(\\)";
         public static final String DIRECTOR_GETINSTANCE = "Director::getInstance()";
 
         public static final String CCBUTTON = "CCButton";
@@ -176,17 +176,23 @@ public class Constants {
 
         public static final String TIME = "cocos2d::Time";
 
-        public static final String GETX = "->getX()";
+        public static final String GETX = "->getX\\(\\)";
         public static final String X = ".x";
 
-        public static final String GETY = "->getY()";
+        public static final String GETY = "->getY\\(\\)";
         public static final String Y = ".y";
 
-        public static final String GETWIDTH = "->getWidth()";
+        public static final String GETWIDTH = "->getWidth\\(\\)";
         public static final String WIDTH = ".width";
 
-        public static final String GETHEIGHT = "->getHeight()";
+        public static final String GETHEIGHT = "->getHeight\\(\\)";
         public static final String HEIGHT = ".height";
+
+        public static final String GETSIZE = "->getSize\\(\\)";
+        public static final String SIZE = ".size";
+
+        public static final String GETORIGIN = "->getOrigin\\(\\)";
+        public static final String ORIGIN = ".origin";
 
         public static final String CGPOINTMAKE = "CGPointMake";
         public static final String VEC2 = COCOS2D + "Vec2";
@@ -325,5 +331,11 @@ public class Constants {
 
         public static final String COPY = "copy";
         public static final String CLONE = "clone";
+
+        public static final String OBJECTFORKEY = "objectForKey";
+        public static final String VALUEFORKEY = "valueForKey";
+
+        public static final String SETOBJECTFORKEY = "setObjectForKey";
+        public static final String SETOBJECT = "setObject";
     }
 }

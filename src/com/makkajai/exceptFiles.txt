@@ -20,5 +20,9 @@ AnimationData
 AnimationCallbackData
 /CandyCounter.h
 SkeletonCharacter
-
+Maxx
+Ymaxx
+AnimationDataCollection
+AnimationEventCallbackData
+CharacterLayer
 

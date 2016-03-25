@@ -93,6 +93,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETY, Keywords.Y);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETWIDTH, Keywords.WIDTH);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETHEIGHT, Keywords.HEIGHT);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETSIZE, Keywords.SIZE);
+        KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETORIGIN, Keywords.ORIGIN);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.CGPOINTMAKE, Keywords.VEC2);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
@@ -149,6 +151,8 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         METHODS_VS_TRANSLATIONS.put(Methods.VIEWSIZE, Methods.GETWINSIZE);
         METHODS_VS_TRANSLATIONS.put(Methods.RUNNINGSCENE, Methods.GETRUNNINGSCENE);
         METHODS_VS_TRANSLATIONS.put(Methods.COPY, Methods.CLONE);
+        METHODS_VS_TRANSLATIONS.put(Methods.OBJECTFORKEY, Methods.VALUEFORKEY);
+        METHODS_VS_TRANSLATIONS.put(Methods.SETOBJECTFORKEY, Methods.SETOBJECT);
 
         instanceVariables = new ArrayList<String>();
         methodSignatures = new ArrayList<String>();
