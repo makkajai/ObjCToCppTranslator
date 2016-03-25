@@ -247,6 +247,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 || importText.contains("ReflectionKit.h")
                 || importText.contains("CoreGraphics.h")
                 || importText.contains("OverlayEffects.h")
+                || importText.contains("MultipeerConnectivity/MultipeerConnectivity.h")
                 )
             writeToOutputBuffer(startIndex, endIndex, importText, "", true);
         else
