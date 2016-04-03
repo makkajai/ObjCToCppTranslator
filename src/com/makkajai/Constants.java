@@ -21,7 +21,7 @@ public class Constants {
     public static final String CC = "CC";
 
     public static final String COCOS2D = "cocos2d" + STATIC_INVOCATION_OPERATOR;
-    public static final String CC_SYNTHESIZE = "CC_SYNTHESIZE(";
+    public static final String CC_SYNTHESIZE = "CC_SYNTHESIZE_RETAIN(";
     public static final String CC_SYNTHESIZE_PASS_BY_REF = "CC_SYNTHESIZE_PASS_BY_REF(";
     public static final String ASTERISK = "*";
     public static final String CCARRAY_FOREACH = "CCARRAY_FOREACH(";
