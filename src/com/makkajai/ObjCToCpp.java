@@ -35,8 +35,8 @@ public class ObjCToCpp {
 
 //        String inputDirectory = args[0];
 //        String outputDirectory = args[1];
-        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Models/App";
-        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai/Models/App";
+        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/scenes";
+        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai/scenes";
 
         List<String> exceptFiles = new ArrayList<String>();
 
@@ -113,7 +113,7 @@ public class ObjCToCpp {
                 System.out.println("###########################Error Processing: " + filePathRelativeToInput + ", Continuing with next set of tiles");
             } finally {
                 Date stopTime = new Date();
-                System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
+//                System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
             }
         }
     }

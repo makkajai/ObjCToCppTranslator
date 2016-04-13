@@ -96,6 +96,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETSIZE, Keywords.SIZE);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.GETORIGIN, Keywords.ORIGIN);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.CGPOINTMAKE, Keywords.VEC2);
+        KEYWORDS_VS_TRANSLATIONS.put(Types.NS_STRING, Types.STRING);
 
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CCP, Methods.VEC2);
         KEYWORDS_VS_TRANSLATIONS.put(Methods.CG_RECT_MAKE, Methods.RECT);
@@ -250,7 +251,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
                 || importText.contains("MultipeerConnectivity/MultipeerConnectivity.h")
                 || importText.contains("GameKit/GameKit.h")
                 )
-            writeToOutputBuffer(startIndex, endIndex, importText, "", true);
+            writeToOutputBuffer(startIndex, endIndex, importText, "#include \"cocos2d.h\"\n", true);
         else
             writeToOutputBuffer(startIndex, endIndex, importText, Keywords.INCLUDE + headerFileName, true);
 
