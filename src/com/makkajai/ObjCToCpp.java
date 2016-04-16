@@ -35,8 +35,8 @@ public class ObjCToCpp {
 
 //        String inputDirectory = args[0];
 //        String outputDirectory = args[1];
-        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Models/Game";
-        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/Classes/Makkajai/Models/Game";
+        String inputDirectory = "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/libs/a-star-obj-c";
+        String outputDirectory = "/Users/administrator/playground/projarea/monster-math-cross-platform/monster-math-2/lib/a-star-obj-c";
 
         List<String> exceptFiles = new ArrayList<String>();
 

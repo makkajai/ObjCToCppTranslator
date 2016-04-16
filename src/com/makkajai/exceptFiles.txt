@@ -206,3 +206,10 @@ EffectDetail
 ConsumableDetail
 CreditDetailData
 CharacterDetail
+CollectCandy
+EventContext
+/EventHandler.h
+LifeCycle
+/Event.h
+/Move.h
+/Speech.h
