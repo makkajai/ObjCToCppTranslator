@@ -972,7 +972,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
             }
         }
 
-        KEYWORDS_VS_TRANSLATIONS.remove(Keywords.SUPER);
+        //KEYWORDS_VS_TRANSLATIONS.remove(Keywords.SUPER);
         KEYWORDS_VS_TRANSLATIONS.put(Types.INSTANCETYPE, className + " " + ASTERISK);
         KEYWORDS_VS_TRANSLATIONS.put(Keywords.SUPER + INSTANCE_INVOCATION_OPERATOR, superClassName + STATIC_INVOCATION_OPERATOR);
         for (final String key : Collections.list(KEYWORDS_VS_TRANSLATIONS.keys())) {
