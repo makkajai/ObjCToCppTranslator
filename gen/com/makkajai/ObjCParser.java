@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class ObjCParser extends Parser {
@@ -433,7 +434,9 @@ public class ObjCParser extends Parser {
 	}
 
 	public static class Preprocessor_declarationContext extends ParserRuleContext {
-		public TerminalNode IMPORT() { return getToken(ObjCParser.IMPORT, 0); }
+		public TerminalNode IMPORT() { 
+                    System.out.println(getToken(ObjCParser.IMPORT,0));
+                    return getToken(ObjCParser.IMPORT, 0); }
 		public TerminalNode INCLUDE() { return getToken(ObjCParser.INCLUDE, 0); }
 		public Preprocessor_declarationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);

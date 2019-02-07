@@ -12,3 +12,5 @@
 hs_err_pid*
 .idea/
 out/
+/Translator/nbproject/private/
+/Translator/build/

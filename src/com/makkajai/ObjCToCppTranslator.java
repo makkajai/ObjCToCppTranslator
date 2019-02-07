@@ -193,6 +193,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
 
     private void startParsing(final TranslateFileInput translateFileInput) {
         //Parser obviously.
+        System.out.println(translateFileInput.filePathRelativeToInput);
         ObjCParser parser = new ObjCParser(tokens);
         ParseTree tree = parser.translation_unit();
         //This is where the entire file is parsed and appropreat callbacks are made to parse the input file.
@@ -224,7 +225,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         int endIndex = startIndex + importText.length();
 
         String fileToImport = importText.replaceAll(Keywords.IMPORT, EMPTY_STRING);
-
+        
         Pattern pattern = Pattern.compile("((\"(.*)\")|(<(.*)>))\\W");
         Matcher matcher = pattern.matcher(fileToImport);
         if (!matcher.matches()) {
@@ -1034,6 +1035,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
     }
 
     private boolean isHeaderFile() {
+        //System.out.println(fileName.endsWith(H));
         return fileName.endsWith(H);
     }
 
@@ -1057,6 +1059,7 @@ public class ObjCToCppTranslator extends ObjCBaseVisitor<Void> {
         variableTypeNameInfo.variableName = tokens.getText(context.declarator().direct_declarator());
         variableTypeNameInfo.variableType = translateIdentifier(tokens.getText(context.declaration_specifiers()));
         variableTypeNameInfo.pointer = context.declarator().pointer() != null ? tokens.getText(context.declarator().pointer()) : EMPTY_STRING;
+        System.out.println(variableTypeNameInfo.variableName + "\t" + variableTypeNameInfo.variableType);
         return variableTypeNameInfo;
     }
 }
