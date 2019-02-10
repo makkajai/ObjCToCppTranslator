@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.makkajai.Constants.*;
+import java.util.Collections;
 
 /**
  * ObjCToCpp - The main class that will drive the entire conversion process.
@@ -55,6 +56,10 @@ public class ObjCToCpp {
                 new RegexFileFilter(FILE_NAME_WITH_H_OR_M),
                 DirectoryFileFilter.DIRECTORY
         ));
+        Collections.sort(files);
+        for(File file: files){
+            System.out.println(file.getName());
+        }
 
 //        String fileName =
 ////                "/Users/administrator/playground/projarea/math-monsters-2/makkajai-number-muncher/makkajai-ios/Makkajai/Makkajai/Utils/MakkajaiEnum"
@@ -71,7 +76,9 @@ public class ObjCToCpp {
         ObjCToCppTranslator visitor = new ObjCToCppTranslator();
 
         for (int i = 0; i < files.size();) {
+                       
             File currentFile = files.get(i);
+            System.out.println("\n\nfile " + i + " " + currentFile.getName());
             String filePathRelativeToInput = currentFile.getAbsolutePath().replace(inputDirectory, "");
             Date startTime = new Date();
             try {
@@ -93,6 +100,7 @@ public class ObjCToCpp {
 
                         Date startTime2 = new Date();
                         translateFileInput.filePathRelativeToInput = filePathRelativeToInput;
+                        System.out.println(filePathRelativeToInput);                        
                         translateFileInput.dryRun = false;
                         visitor.translateFile(translateFileInput);
                         stopTime = new Date();
@@ -101,6 +109,7 @@ public class ObjCToCpp {
                         e.printStackTrace();
                         System.out.println("###########################Error Processing: " + filePathRelativeToInput + ", Continuing with next set of tiles");
                     } finally {
+                        System.out.println(currentFile.getName());
                         i+=2;
                     }
                     continue;
@@ -113,7 +122,7 @@ public class ObjCToCpp {
                 System.out.println("###########################Error Processing: " + filePathRelativeToInput + ", Continuing with next set of tiles");
             } finally {
                 Date stopTime = new Date();
-//                System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
+               System.out.println("Processed File(s): " + filePathRelativeToInput.replaceAll(H_OR_M, "") + " Time Taken: " + getDelta(startTime, stopTime));
             }
         }
     }
@@ -121,7 +130,10 @@ public class ObjCToCpp {
     private static boolean isIgnoredFile(String filePathRelativeToInput, List<String> exceptFiles) {
         for (String exceptFile : exceptFiles) {
             if(filePathRelativeToInput.contains(exceptFile))
+            { 
+                System.out.println("exceptfile: " + exceptFile);
                 return true;
+            }
         }
         return false;
     }
