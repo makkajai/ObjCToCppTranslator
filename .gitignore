@@ -14,3 +14,4 @@ hs_err_pid*
 out/
 /Translator/nbproject/private/
 /Translator/build/
+.DS_Store
